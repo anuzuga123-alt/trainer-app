@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zuga Fitness Trainer</title>
+    <meta name="theme-color" content="#6C63FF">
+    <meta name="description" content="Professional fitness trainer client management app">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        :root {
+            --primary: #6C63FF;
+            --primary-light: #8A85FF;
+            --primary-dark: #5752D4;
+            --secondary: #FF6584;
+            --accent: #36D1DC;
+            --white: #ffffff;
+            --light: #F8F9FF;
+            --light-gray: #EFF1F8;
+            --gray: #A0A3BD;
+            --dark-gray: #6E7191;
+            --text: #14142B;
+            --shadow: 0 10px 30px rgba(108, 99, 255, 0.15);
+            --shadow-light: 0 5px 15px rgba(108, 99, 255, 0.1);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        body {
+            background: linear-gradient(135deg, #F8F9FF 0%, #EFF1F8 100%);
+            color: var(--text);
+            line-height: 1.6;
+            padding-top: var(--safe-area-top);
+            padding-bottom: calc(80px + var(--safe-area-bottom));
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
+        }
+
+        /* Common Components */
+        .container {
+            max-width: 100%;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .card:hover {
+            box-shadow: 0 15px 40px rgba(108, 99, 255, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 16px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-light);
+            touch-action: manipulation;
+            min-height: 56px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .btn:hover::after, .btn:active::after {
+            opacity: 1;
+        }
+
+        .btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #FF8FA0 100%);
+        }
+
+        .btn-secondary::after {
+            background: linear-gradient(135deg, #FF8FA0 0%, #FF4D6D 100%);
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent) 0%, #5B86E5 100%);
+        }
+
+        .btn-accent::after {
+            background: linear-gradient(135deg, #5B86E5 0%, #36D1DC 100%);
+        }
+
+        .btn-small {
+            padding: 12px 20px;
+            font-size: 14px;
+            min-height: 44px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            box-shadow: none;
+        }
+
+        .btn-outline::after {
+            background: var(--primary);
+        }
+
+        .btn-outline:hover, .btn-outline:active {
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid var(--light-gray);
+            border-radius: var(--radius-sm);
+            font-size: 16px;
+            transition: var(--transition);
+            -webkit-appearance: none;
+            background: var(--white);
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 20px;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding-top: calc(20px + var(--safe-area-top));
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 22px;
+        }
+
+        .logo-icon {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Login View */
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 120px);
+            padding: 20px;
+        }
+
+        .login-card {
+            max-width: 440px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            margin-bottom: 12px;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .login-card p {
+            color: var(--dark-gray);
+            margin-bottom: 36px;
+            font-size: 16px;
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 36px;
+            box-shadow: var(--shadow);
+        }
+
+        .register-link {
+            margin-top: 24px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: var(--transition);
+        }
+
+        .register-link:hover {
+            color: var(--primary-dark);
+        }
+
+        /* Dashboard View */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .dashboard-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-light);
+        }
+
+        .stat-card:nth-child(2) {
+            background: linear-gradient(135deg, var(--secondary) 0%, #FF8FA0 100%);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .client-list {
+            list-style: none;
+        }
+
+        .client-item {
+            padding: 20px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            background: var(--white);
+            box-shadow: var(--shadow-light);
+        }
+
+        .client-item:active {
+            background: var(--light);
+            transform: scale(0.995);
+        }
+
+        .client-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .client-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 16px;
+            flex-shrink: 0;
+            font-size: 20px;
+            box-shadow: var(--shadow-light);
+        }
+
+        .client-info {
+            flex: 1;
+        }
+
+        .client-name {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 18px;
+        }
+
+        .client-details {
+            font-size: 14px;
+            color: var(--dark-gray);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .client-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--light);
+            color: var(--dark-gray);
+        }
+
+        /* Client Profile View */
+        .client-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .client-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 14px;
+        }
+
+        .detail-value {
+            text-align: right;
+            max-width: 60%;
+            word-break: break-word;
+            font-weight: 500;
+        }
+
+        /* Calendar */
+        .calendar {
+            margin-bottom: 24px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 12px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--dark-gray);
+            padding: 12px 0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            background: var(--light);
+            font-size: 14px;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        .calendar-day:active {
+            transform: scale(0.9);
+        }
+
+        .calendar-day.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .calendar-day.present {
+            background: #4caf50;
+            color: white;
+        }
+
+        .calendar-day.absent {
+            background: #f44336;
+            color: white;
+        }
+
+        .calendar-day.holiday {
+            background: #ff9800;
+            color: white;
+        }
+
+        .calendar-day.freeze {
+            background: #2196f3;
+            color: white;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--primary);
+        }
+
+        /* Day Info */
+        .day-info-card {
+            margin-top: 24px;
+        }
+
+        .day-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-width: 80%;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Floating Home Button */
+        .floating-home {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            z-index: 100;
+            transition: var(--transition);
+            font-size: 24px;
+            touch-action: manipulation;
+            bottom: calc(24px + var(--safe-area-bottom));
+        }
+
+        .floating-home:active {
+            transform: scale(0.95);
+        }
+
+        /* Install Prompt */
+        .install-prompt {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            padding: 20px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1000;
+            border-top-left-radius: var(--radius);
+            border-top-right-radius: var(--radius);
+        }
+
+        .install-prompt.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .install-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .install-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .install-text {
+            flex: 1;
+        }
+
+        .install-text h3 {
+            margin-bottom: 4px;
+            font-size: 18px;
+        }
+
+        .install-text p {
+            font-size: 14px;
+            color: var(--dark-gray);
+        }
+
+        .install-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--dark-gray);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 700px;
+                margin: 0 auto;
+            }
+            
+            .client-detail-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .stats-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn {
+                width: 100%;
+            }
+            
+            .client-header, .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .calendar-day {
+                font-size: 12px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .install-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .install-actions {
+                width: 100%;
+            }
+            
+            .install-actions .btn {
+                flex: 1;
+            }
+        }
+
+        /* Animation for page transitions */
+        .view.active {
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login View -->
+    <div id="loginView" class="view active">
+        <div class="login-container">
+            <div class="login-card card">
+                <div class="app-icon">💪</div>
+                <h1>Zuga Fitness</h1>
+                <p>Professional trainer client management</p>
+                
+                <div class="form-group">
+                    <label for="loginEmail">Email or Phone</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="loginEmail" placeholder="Enter your email or phone">
+                        <div class="input-icon">📱</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" placeholder="Enter your password">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                </div>
+                
+                <button class="btn" id="loginBtn" style="width: 100%; margin-top: 10px;">
+                    <span id="loginText">Login</span>
+                    <span id="loginSpinner" class="spinner" style="display: none;"></span>
+                </button>
+                
+                <a href="#" class="register-link" id="showRegister">Create new trainer account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration View -->
+    <div id="registerView" class="view">
+        <div class="login-container">
+            <div class="login-card card">
+                <div class="app-icon">👤</div>
+                <h1>Join Zuga Fitness</h1>
+                <p>Create your trainer account</p>
+                
+                <div class="form-group">
+                    <label for="regName">Full Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="regName" placeholder="Enter your full name">
+                        <div class="input-icon">👤</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPhone">Phone</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="regPhone" placeholder="Enter your phone number">
+                        <div class="input-icon">📞</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="regEmail" placeholder="Enter your email">
+                        <div class="input-icon">📧</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="regPassword" placeholder="Create a password">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regOTP">Verification Code</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="regOTP" placeholder="Enter code (use 123456)">
+                        <div class="input-icon">🔢</div>
+                    </div>
+                </div>
+                
+                <button class="btn" id="registerBtn" style="width: 100%; margin-top: 10px;">
+                    <span id="registerText">Create Account</span>
+                    <span id="registerSpinner" class="spinner" style="display: none;"></span>
+                </button>
+                
+                <a href="#" class="register-link" id="showLogin">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboardView" class="view">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">💪</div>
+                <span>Zuga Fitness</span>
+            </div>
+            <button class="btn btn-secondary btn-small" id="logoutBtn">Logout</button>
+        </div>
+        
+        <div class="container">
+            <div class="dashboard-header">
+                <h2 class="dashboard-title">My Clients</h2>
+                <button class="btn" id="addClientBtn">+ Add New Client</button>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalClients">0</div>
+                    <div class="stat-label">Total Clients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeClients">0</div>
+                    <div class="stat-label">Active Clients</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <ul class="client-list" id="clientList">
+                    <!-- Client list will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Profile View -->
+    <div id="clientView" class="view">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">🧘‍♀️</div>
+                <span id="clientViewTitle">Client Profile</span>
+            </div>
+            <button class="btn btn-secondary btn-small" id="backToDashboardBtn">Back</button>
+        </div>
+        
+        <div class="container">
+            <!-- Client Info Section -->
+            <div class="client-header">
+                <h2 id="clientName">Client Name</h2>
+                <button class="btn btn-small" id="editClientBtn">Edit Profile</button>
+            </div>
+            
+            <div class="card" id="clientInfoCard">
+                <div class="client-detail-row">
+                    <div class="detail-label">Age</div>
+                    <div class="detail-value" id="clientAge">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Gender</div>
+                    <div class="detail-value" id="clientGender">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Joining Date</div>
+                    <div class="detail-value" id="clientJoiningDate">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Renewal Date</div>
+                    <div class="detail-value" id="clientRenewalDate">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Height</div>
+                    <div class="detail-value" id="clientHeight">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Weight</div>
+                    <div class="detail-value" id="clientWeight">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Medical Condition</div>
+                    <div class="detail-value" id="clientMedical">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Injuries</div>
+                    <div class="detail-value" id="clientInjuries">-</div>
+                </div>
+            </div>
+            
+            <!-- Calendar Section -->
+            <div class="card calendar">
+                <div class="calendar-header">
+                    <h3 class="calendar-title" id="calendarMonth">October 2023</h3>
+                    <div class="calendar-nav">
+                        <button class="btn btn-outline btn-small" id="prevMonthBtn">‹</button>
+                        <button class="btn btn-outline btn-small" id="nextMonthBtn">›</button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar days will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Day Info Section -->
+            <div class="card day-info-card">
+                <div class="day-info-header">
+                    <h3 id="selectedDate">Selected Date</h3>
+                </div>
+                
+                <div class="form-group">
+                    <label for="attendanceSelect">Attendance Status</label>
+                    <select id="attendanceSelect">
+                        <option value="">Select status</option>
+                        <option value="present">🟢 Present</option>
+                        <option value="absent">🔴 Absent</option>
+                        <option value="holiday">🟡 Holiday</option>
+                        <option value="freeze">🔵 Freeze</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="workoutNotes">Workout Notes</label>
+                    <textarea id="workoutNotes" rows="3" placeholder="Enter today's workout details, progress, or any notes"></textarea>
+                </div>
+                
+                <button class="btn" id="saveDayInfoBtn" style="width: 100%;">Save Day Info</button>
+            </div>
+            
+            <!-- Progress Section -->
+            <div class="card">
+                <button class="btn btn-accent" id="downloadReportBtn" style="width: 100%;">📊 Download Monthly Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Client Modal -->
+    <div id="editClientModal" class="view">
+        <div class="container">
+            <div class="login-card card">
+                <h2 id="editClientTitle">Edit Client</h2>
+                
+                <div class="form-group">
+                    <label for="editClientName">Name</label>
+                    <input type="text" id="editClientName" placeholder="Client name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientAge">Age</label>
+                    <input type="number" id="editClientAge" placeholder="Age">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientGender">Gender</label>
+                    <select id="editClientGender">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientJoiningDate">Joining Date</label>
+                    <input type="date" id="editClientJoiningDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientRenewalDate">Renewal Date</label>
+                    <input type="date" id="editClientRenewalDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientHeight">Height (cm)</label>
+                    <input type="number" id="editClientHeight" placeholder="Height in cm">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientWeight">Weight (kg)</label>
+                    <input type="number" id="editClientWeight" placeholder="Weight in kg">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientMedical">Medical Condition</label>
+                    <input type="text" id="editClientMedical" placeholder="Any medical conditions">
+                </div>
+                
+                <div class="form-group">
+                    <label for="editClientInjuries">Injuries</label>
+                    <input type="text" id="editClientInjuries" placeholder="Any injuries">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" id="saveClientBtn" style="flex: 1;">Save Changes</button>
+                    <button class="btn btn-secondary" id="cancelEditBtn" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Client Modal -->
+    <div id="addClientModal" class="view">
+        <div class="container">
+            <div class="login-card card">
+                <h2>Add New Client</h2>
+                
+                <div class="form-group">
+                    <label for="newClientName">Name</label>
+                    <input type="text" id="newClientName" placeholder="Client name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientAge">Age</label>
+                    <input type="number" id="newClientAge" placeholder="Age">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientGender">Gender</label>
+                    <select id="newClientGender">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientJoiningDate">Joining Date</label>
+                    <input type="date" id="newClientJoiningDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientRenewalDate">Renewal Date</label>
+                    <input type="date" id="newClientRenewalDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientHeight">Height (cm)</label>
+                    <input type="number" id="newClientHeight" placeholder="Height in cm">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientWeight">Weight (kg)</label>
+                    <input type="number" id="newClientWeight" placeholder="Weight in kg">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientMedical">Medical Condition</label>
+                    <input type="text" id="newClientMedical" placeholder="Any medical conditions">
+                </div>
+                
+                <div class="form-group">
+                    <label for="newClientInjuries">Injuries</label>
+                    <input type="text" id="newClientInjuries" placeholder="Any injuries">
+                </div>
+                
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn" id="saveNewClientBtn" style="flex: 1;">Add Client</button>
+                    <button class="btn btn-secondary" id="cancelAddBtn" style="flex: 1;">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Floating Home Button -->
+    <div class="floating-home" id="floatingHomeBtn">🏠</div>
+
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <div class="install-content">
+            <div class="install-icon">📱</div>
+            <div class="install-text">
+                <h3>Install Zuga Fitness</h3>
+                <p>Install this app on your home screen for quick and easy access</p>
+            </div>
+            <div class="install-actions">
+                <button class="btn btn-small" id="installBtn">Install</button>
+                <button class="btn btn-secondary btn-small" id="dismissInstallBtn">Later</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State
+        const state = {
+            currentView: 'login',
+            currentTrainer: null,
+            currentClient: null,
+            currentDate: new Date(),
+            selectedDate: null,
+            trainers: JSON.parse(localStorage.getItem('zugaTrainers')) || [],
+            clients: JSON.parse(localStorage.getItem('zugaClients')) || {},
+            deferredPrompt: null
+        };
+
+        // DOM Elements
+        const views = {
+            login: document.getElementById('loginView'),
+            register: document.getElementById('registerView'),
+            dashboard: document.getElementById('dashboardView'),
+            client: document.getElementById('clientView'),
+            editClient: document.getElementById('editClientModal'),
+            addClient: document.getElementById('addClientModal')
+        };
+
+        // Initialize the app
+        function initApp() {
+            // Check if user is already logged in
+            const savedTrainer = localStorage.getItem('currentTrainer');
+            if (savedTrainer) {
+                state.currentTrainer = JSON.parse(savedTrainer);
+                showView('dashboard');
+                renderClientList();
+                updateStats();
+            }
+
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Set default dates for new client form
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('newClientJoiningDate').value = today;
+            
+            // Set renewal date to 30 days from today
+            const renewalDate = new Date();
+            renewalDate.setDate(renewalDate.getDate() + 30);
+            document.getElementById('newClientRenewalDate').value = renewalDate.toISOString().split('T')[0];
+            
+            // Initialize PWA install prompt
+            initPWAInstall();
+        }
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Login/Registration
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            document.getElementById('registerBtn').addEventListener('click', handleRegister);
+            document.getElementById('showRegister').addEventListener('click', () => showView('register'));
+            document.getElementById('showLogin').addEventListener('click', () => showView('login'));
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            // Dashboard
+            document.getElementById('addClientBtn').addEventListener('click', () => showView('addClient'));
+            document.getElementById('backToDashboardBtn').addEventListener('click', () => showView('dashboard'));
+            
+            // Client View
+            document.getElementById('editClientBtn').addEventListener('click', () => showEditClientForm());
+            document.getElementById('saveDayInfoBtn').addEventListener('click', saveDayInfo);
+            document.getElementById('downloadReportBtn').addEventListener('click', downloadMonthlyReport);
+            
+            // Calendar Navigation
+            document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
+            document.getElementById('nextMonthBtn').addEventListener('click', nextMonth);
+            
+            // Client Forms
+            document.getElementById('saveClientBtn').addEventListener('click', saveClient);
+            document.getElementById('cancelEditBtn').addEventListener('click', () => showView('client'));
+            document.getElementById('saveNewClientBtn').addEventListener('click', addNewClient);
+            document.getElementById('cancelAddBtn').addEventListener('click', () => showView('dashboard'));
+            
+            // Floating Home Button
+            document.getElementById('floatingHomeBtn').addEventListener('click', () => showView('dashboard'));
+            
+            // Install Prompt
+            document.getElementById('installBtn').addEventListener('click', installPWA);
+            document.getElementById('dismissInstallBtn').addEventListener('click', dismissInstallPrompt);
+            
+            // Allow Enter key to submit forms
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (state.currentView === 'login') {
+                        handleLogin();
+                    } else if (state.currentView === 'register') {
+                        handleRegister();
+                    }
+                }
+            });
+            
+            // Handle touch events for better mobile experience
+            document.addEventListener('touchstart', function() {}, {passive: true});
+        }
+
+        // Initialize PWA install prompt
+        function initPWAInstall() {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                // Stash the event so it can be triggered later
+                state.deferredPrompt = e;
+                // Show our custom install prompt
+                setTimeout(() => {
+                    showInstallPrompt();
+                }, 3000);
+            });
+
+            window.addEventListener('appinstalled', () => {
+                // Hide the app-provided install promotion
+                hideInstallPrompt();
+                // Clear the deferredPrompt so it can be garbage collected
+                state.deferredPrompt = null;
+                showToast('App installed successfully!');
+            });
+        }
+
+        // Show install prompt
+        function showInstallPrompt() {
+            const installPrompt = document.getElementById('installPrompt');
+            installPrompt.classList.add('show');
+        }
+
+        // Hide install prompt
+        function hideInstallPrompt() {
+            const installPrompt = document.getElementById('installPrompt');
+            installPrompt.classList.remove('show');
+        }
+
+        // Dismiss install prompt
+        function dismissInstallPrompt() {
+            hideInstallPrompt();
+            // You might want to set a flag in localStorage so the prompt doesn't show again for a while
+            localStorage.setItem('installPromptDismissed', 'true');
+        }
+
+        // Install PWA
+        function installPWA() {
+            if (!state.deferredPrompt) return;
+            
+            // Show the install prompt
+            state.deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            state.deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                } else {
+                    console.log('User dismissed the install prompt');
+                }
+                // Clear the deferredPrompt so it can be garbage collected
+                state.deferredPrompt = null;
+                hideInstallPrompt();
+            });
+        }
+
+        // Show a specific view
+        function showView(viewName) {
+            // Hide all views
+            Object.values(views).forEach(view => {
+                view.classList.remove('active');
+            });
+            
+            // Show the requested view
+            views[viewName].classList.add('active');
+            state.currentView = viewName;
+            
+            // Perform view-specific initializations
+            if (viewName === 'dashboard') {
+                renderClientList();
+                updateStats();
+            } else if (viewName === 'client' && state.currentClient) {
+                renderClientProfile();
+                renderCalendar();
+            }
+            
+            // Hide install prompt when navigating
+            hideInstallPrompt();
+        }
+
+        // Update dashboard statistics
+        function updateStats() {
+            if (!state.currentTrainer) return;
+            
+            const trainerClients = state.clients[state.currentTrainer.id] || [];
+            const totalClients = trainerClients.length;
+            const activeClients = trainerClients.filter(client => {
+                const renewalDate = new Date(client.renewalDate);
+                return renewalDate >= new Date();
+            }).length;
+            
+            document.getElementById('totalClients').textContent = totalClients;
+            document.getElementById('activeClients').textContent = activeClients;
+        }
+
+        // Handle user login
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showToast('Please enter both email and password');
+                return;
+            }
+            
+            // Show loading state
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            
+            loginText.style.display = 'none';
+            loginSpinner.style.display = 'inline-block';
+            loginBtn.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Find trainer in stored data
+                const trainer = state.trainers.find(t => 
+                    (t.email === email || t.phone === email) && t.password === password
+                );
+                
+                if (trainer) {
+                    state.currentTrainer = trainer;
+                    localStorage.setItem('currentTrainer', JSON.stringify(trainer));
+                    showView('dashboard');
+                    renderClientList();
+                    updateStats();
+                    showToast(`Welcome back, ${trainer.name}!`);
+                } else {
+                    showToast('Invalid credentials. Please try again.');
+                }
+                
+                // Reset button state
+                loginText.style.display = 'inline-block';
+                loginSpinner.style.display = 'none';
+                loginBtn.disabled = false;
+            }, 1000);
+        }
+
+        // Handle user registration
+        function handleRegister() {
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const otp = document.getElementById('regOTP').value;
+            
+            if (!name || !phone || !email || !password || !otp) {
+                showToast('Please fill all fields');
+                return;
+            }
+            
+            // Mock OTP verification
+            if (otp !== '123456') {
+                showToast('Invalid OTP. Please use 123456 for testing.');
+                return;
+            }
+            
+            // Check if trainer already exists
+            if (state.trainers.some(t => t.email === email)) {
+                showToast('A trainer with this email already exists');
+                return;
+            }
+            
+            // Show loading state
+            const registerBtn = document.getElementById('registerBtn');
+            const registerText = document.getElementById('registerText');
+            const registerSpinner = document.getElementById('registerSpinner');
+            
+            registerText.style.display = 'none';
+            registerSpinner.style.display = 'inline-block';
+            registerBtn.disabled = true;
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                // Create new trainer
+                const newTrainer = {
+                    id: generateId(),
+                    name,
+                    phone,
+                    email,
+                    password
+                };
+                
+                state.trainers.push(newTrainer);
+                localStorage.setItem('zugaTrainers', JSON.stringify(state.trainers));
+                
+                state.currentTrainer = newTrainer;
+                localStorage.setItem('currentTrainer', JSON.stringify(newTrainer));
+                
+                showView('dashboard');
+                renderClientList();
+                updateStats();
+                showToast(`Account created successfully! Welcome, ${name}`);
+                
+                // Reset button state
+                registerText.style.display = 'inline-block';
+                registerSpinner.style.display = 'none';
+                registerBtn.disabled = false;
+            }, 1000);
+        }
+
+        // Handle user logout
+        function handleLogout() {
+            state.currentTrainer = null;
+            localStorage.removeItem('currentTrainer');
+            showView('login');
+            showToast('Logged out successfully');
+        }
+
+        // Render the list of clients
+        function renderClientList() {
+            const clientList = document.getElementById('clientList');
+            clientList.innerHTML = '';
+            
+            if (!state.currentTrainer) return;
+            
+            const trainerClients = state.clients[state.currentTrainer.id] || [];
+            
+            if (trainerClients.length === 0) {
+                clientList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">👥</div>
+                        <h3>No Clients Yet</h3>
+                        <p>Add your first client to get started</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            trainerClients.forEach(client => {
+                const li = document.createElement('li');
+                li.className = 'client-item';
+                li.addEventListener('click', () => {
+                    state.currentClient = client;
+                    showView('client');
+                });
+                
+                // Determine status
+                const renewalDate = new Date(client.renewalDate);
+                const today = new Date();
+                const isActive = renewalDate >= today;
+                const statusText = isActive ? 'Active' : 'Inactive';
+                const statusIcon = isActive ? '🟢' : '🔴';
+                
+                li.innerHTML = `
+                    <div style="display: flex; align-items: center;">
+                        <div class="client-avatar">${client.name.charAt(0)}</div>
+                        <div class="client-info">
+                            <div class="client-name">${client.name}</div>
+                            <div class="client-details">
+                                <span>${client.age} yrs • ${client.gender}</span>
+                                <div class="client-status">${statusIcon} ${statusText}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="color: var(--gray); font-size: 20px;">›</div>
+                `;
+                
+                clientList.appendChild(li);
+            });
+        }
+
+        // Render client profile
+        function renderClientProfile() {
+            if (!state.currentClient) return;
+            
+            document.getElementById('clientViewTitle').textContent = state.currentClient.name;
+            document.getElementById('clientName').textContent = state.currentClient.name;
+            document.getElementById('clientAge').textContent = state.currentClient.age;
+            document.getElementById('clientGender').textContent = state.currentClient.gender;
+            document.getElementById('clientJoiningDate').textContent = formatDate(state.currentClient.joiningDate);
+            document.getElementById('clientRenewalDate').textContent = formatDate(state.currentClient.renewalDate);
+            document.getElementById('clientHeight').textContent = state.currentClient.height ? `${state.currentClient.height} cm` : '-';
+            document.getElementById('clientWeight').textContent = state.currentClient.weight ? `${state.currentClient.weight} kg` : '-';
+            document.getElementById('clientMedical').textContent = state.currentClient.medicalCondition || '-';
+            document.getElementById('clientInjuries').textContent = state.currentClient.injuries || '-';
+            
+            // Set selected date to today if not set
+            if (!state.selectedDate) {
+                state.selectedDate = new Date().toISOString().split('T')[0];
+            }
+            
+            updateDayInfo();
+        }
+
+        // Show edit client form
+        function showEditClientForm() {
+            if (!state.currentClient) return;
+            
+            document.getElementById('editClientTitle').textContent = `Edit ${state.currentClient.name}`;
+            document.getElementById('editClientName').value = state.currentClient.name;
+            document.getElementById('editClientAge').value = state.currentClient.age;
+            document.getElementById('editClientGender').value = state.currentClient.gender;
+            document.getElementById('editClientJoiningDate').value = state.currentClient.joiningDate;
+            document.getElementById('editClientRenewalDate').value = state.currentClient.renewalDate;
+            document.getElementById('editClientHeight').value = state.currentClient.height || '';
+            document.getElementById('editClientWeight').value = state.currentClient.weight || '';
+            document.getElementById('editClientMedical').value = state.currentClient.medicalCondition || '';
+            document.getElementById('editClientInjuries').value = state.currentClient.injuries || '';
+            
+            showView('editClient');
+        }
+
+        // Save client details
+        function saveClient() {
+            if (!state.currentClient) return;
+            
+            const name = document.getElementById('editClientName').value;
+            const age = document.getElementById('editClientAge').value;
+            const gender = document.getElementById('editClientGender').value;
+            const joiningDate = document.getElementById('editClientJoiningDate').value;
+            const renewalDate = document.getElementById('editClientRenewalDate').value;
+            const height = document.getElementById('editClientHeight').value;
+            const weight = document.getElementById('editClientWeight').value;
+            const medicalCondition = document.getElementById('editClientMedical').value;
+            const injuries = document.getElementById('editClientInjuries').value;
+            
+            if (!name || !age || !gender || !joiningDate || !renewalDate) {
+                showToast('Please fill all required fields');
+                return;
+            }
+            
+            // Update client
+            state.currentClient.name = name;
+            state.currentClient.age = age;
+            state.currentClient.gender = gender;
+            state.currentClient.joiningDate = joiningDate;
+            state.currentClient.renewalDate = renewalDate;
+            state.currentClient.height = height;
+            state.currentClient.weight = weight;
+            state.currentClient.medicalCondition = medicalCondition;
+            state.currentClient.injuries = injuries;
+            
+            // Save to localStorage
+            saveClientsToStorage();
+            
+            showView('client');
+            renderClientProfile();
+            showToast('Client details updated successfully');
+        }
+
+        // Add a new client
+        function addNewClient() {
+            const name = document.getElementById('newClientName').value;
+            const age = document.getElementById('newClientAge').value;
+            const gender = document.getElementById('newClientGender').value;
+            const joiningDate = document.getElementById('newClientJoiningDate').value;
+            const renewalDate = document.getElementById('newClientRenewalDate').value;
+            const height = document.getElementById('newClientHeight').value;
+            const weight = document.getElementById('newClientWeight').value;
+            const medicalCondition = document.getElementById('newClientMedical').value;
+            const injuries = document.getElementById('newClientInjuries').value;
+            
+            if (!name || !age || !gender || !joiningDate || !renewalDate) {
+                showToast('Please fill all required fields');
+                return;
+            }
+            
+            // Create new client
+            const newClient = {
+                id: generateId(),
+                name,
+                age,
+                gender,
+                joiningDate,
+                renewalDate,
+                height,
+                weight,
+                medicalCondition,
+                injuries,
+                attendance: {}
+            };
+            
+            // Add to trainer's clients
+            if (!state.clients[state.currentTrainer.id]) {
+                state.clients[state.currentTrainer.id] = [];
+            }
+            
+            state.clients[state.currentTrainer.id].push(newClient);
+            saveClientsToStorage();
+            
+            showView('dashboard');
+            renderClientList();
+            updateStats();
+            showToast(`Client ${name} added successfully`);
+            
+            // Reset form
+            document.getElementById('newClientName').value = '';
+            document.getElementById('newClientAge').value = '';
+            document.getElementById('newClientGender').value = '';
+            document.getElementById('newClientHeight').value = '';
+            document.getElementById('newClientWeight').value = '';
+            document.getElementById('newClientMedical').value = '';
+            document.getElementById('newClientInjuries').value = '';
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const monthYear = document.getElementById('calendarMonth');
+            
+            // Set month/year header
+            const options = { year: 'numeric', month: 'long' };
+            monthYear.textContent = state.currentDate.toLocaleDateString('en-US', options);
+            
+            // Clear calendar
+            calendarGrid.innerHTML = '';
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth(), 1);
+            const lastDay = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay(); // 0 = Sunday, 1 = Monday, etc.
+            
+            // Add empty cells for days before the first day of the month
+            for (let i = 0; i < startingDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyCell);
+            }
+            
+            // Add cells for each day of the month
+            const today = new Date().toISOString().split('T')[0];
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'calendar-day';
+                dayCell.textContent = day;
+                
+                // Format date as YYYY-MM-DD
+                const dateStr = `${state.currentDate.getFullYear()}-${(state.currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                
+                // Check if this is today
+                if (dateStr === today) {
+                    dayCell.classList.add('today');
+                }
+                
+                // Check if this date is selected
+                if (dateStr === state.selectedDate) {
+                    dayCell.classList.add('selected');
+                }
+                
+                // Check attendance status for this date
+                if (state.currentClient.attendance && state.currentClient.attendance[dateStr]) {
+                    const status = state.currentClient.attendance[dateStr].status;
+                    dayCell.classList.add(status);
+                }
+                
+                dayCell.addEventListener('click', () => {
+                    // Remove selected class from all days
+                    document.querySelectorAll('.calendar-day').forEach(cell => {
+                        cell.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked day
+                    dayCell.classList.add('selected');
+                    
+                    // Update selected date
+                    state.selectedDate = dateStr;
+                    updateDayInfo();
+                });
+                
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+
+        // Navigate to previous month
+        function prevMonth() {
+            state.currentDate.setMonth(state.currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        // Navigate to next month
+        function nextMonth() {
+            state.currentDate.setMonth(state.currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        // Update day info based on selected date
+        function updateDayInfo() {
+            if (!state.selectedDate) return;
+            
+            const selectedDateElement = document.getElementById('selectedDate');
+            const attendanceSelect = document.getElementById('attendanceSelect');
+            const workoutNotes = document.getElementById('workoutNotes');
+            
+            // Format and display selected date
+            const date = new Date(state.selectedDate);
+            selectedDateElement.textContent = date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            // Set attendance and notes if they exist
+            if (state.currentClient.attendance && state.currentClient.attendance[state.selectedDate]) {
+                const dayData = state.currentClient.attendance[state.selectedDate];
+                attendanceSelect.value = dayData.status;
+                workoutNotes.value = dayData.notes || '';
+            } else {
+                attendanceSelect.value = '';
+                workoutNotes.value = '';
+            }
+        }
+
+        // Save day info (attendance and notes)
+        function saveDayInfo() {
+            if (!state.selectedDate || !state.currentClient) return;
+            
+            const attendance = document.getElementById('attendanceSelect').value;
+            const notes = document.getElementById('workoutNotes').value;
+            
+            if (!attendance) {
+                showToast('Please select an attendance status');
+                return;
+            }
+            
+            // Initialize attendance object if it doesn't exist
+            if (!state.currentClient.attendance) {
+                state.currentClient.attendance = {};
+            }
+            
+            // Save day info
+            state.currentClient.attendance[state.selectedDate] = {
+                status: attendance,
+                notes: notes
+            };
+            
+            // Save to localStorage
+            saveClientsToStorage();
+            
+            // Update calendar display
+            renderCalendar();
+            
+            showToast('Day info saved successfully');
+        }
+
+        // Download monthly report
+        function downloadMonthlyReport() {
+            if (!state.currentClient) return;
+            
+            // Create a simple report in a new window
+            const reportWindow = window.open('', '_blank');
+            const monthYear = state.currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+            
+            let reportHTML = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Monthly Report - ${state.currentClient.name} - ${monthYear}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h1 { color: #6C63FF; }
+                        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        th { background-color: #f2f2f2; }
+                        .present { background-color: #4caf50; color: white; }
+                        .absent { background-color: #f44336; color: white; }
+                        .holiday { background-color: #ff9800; color: white; }
+                        .freeze { background-color: #2196f3; color: white; }
+                        @media print {
+                            body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Zuga Fitness - Monthly Report</h1>
+                    <h2>${state.currentClient.name} - ${monthYear}</h2>
+                    
+                    <h3>Client Details</h3>
+                    <p><strong>Age:</strong> ${state.currentClient.age}</p>
+                    <p><strong>Gender:</strong> ${state.currentClient.gender}</p>
+                    <p><strong>Height:</strong> ${state.currentClient.height || 'N/A'} cm</p>
+                    <p><strong>Weight:</strong> ${state.currentClient.weight || 'N/A'} kg</p>
+                    <p><strong>Medical Conditions:</strong> ${state.currentClient.medicalCondition || 'None'}</p>
+                    <p><strong>Injuries:</strong> ${state.currentClient.injuries || 'None'}</p>
+                    
+                    <h3>Attendance Summary</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Get all dates in the current month
+            const firstDay = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth(), 1);
+            const lastDay = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            
+            let presentCount = 0;
+            let absentCount = 0;
+            let holidayCount = 0;
+            let freezeCount = 0;
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${state.currentDate.getFullYear()}-${(state.currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                const date = new Date(dateStr);
+                const dayData = state.currentClient.attendance ? state.currentClient.attendance[dateStr] : null;
+                
+                let status = 'Not Recorded';
+                let statusClass = '';
+                let notes = '';
+                
+                if (dayData) {
+                    status = dayData.status.charAt(0).toUpperCase() + dayData.status.slice(1);
+                    statusClass = dayData.status;
+                    notes = dayData.notes || '';
+                    
+                    // Count statuses
+                    switch(dayData.status) {
+                        case 'present': presentCount++; break;
+                        case 'absent': absentCount++; break;
+                        case 'holiday': holidayCount++; break;
+                        case 'freeze': freezeCount++; break;
+                    }
+                }
+                
+                reportHTML += `
+                    <tr>
+                        <td>${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</td>
+                        <td class="${statusClass}">${status}</td>
+                        <td>${notes}</td>
+                    </tr>
+                `;
+            }
+            
+            reportHTML += `
+                        </tbody>
+                    </table>
+                    
+                    <h3>Summary</h3>
+                    <p><strong>Present:</strong> ${presentCount} days</p>
+                    <p><strong>Absent:</strong> ${absentCount} days</p>
+                    <p><strong>Holiday:</strong> ${holidayCount} days</p>
+                    <p><strong>Freeze:</strong> ${freezeCount} days</p>
+                    <p><strong>Total Recorded:</strong> ${presentCount + absentCount + holidayCount + freezeCount} of ${daysInMonth} days</p>
+                    
+                    <div class="no-print" style="margin-top: 30px;">
+                        <button onclick="window.print()">Print Report</button>
+                        <button onclick="window.close()">Close</button>
+                    </div>
+                    
+                    <p style="margin-top: 30px; font-style: italic;">Generated on ${new Date().toLocaleDateString()} by Zuga Fitness Trainer</p>
+                </body>
+                </html>
+            `;
+            
+            reportWindow.document.write(reportHTML);
+            reportWindow.document.close();
+            
+            showToast('Monthly report generated');
+        }
+
+        // Save clients to localStorage
+        function saveClientsToStorage() {
+            localStorage.setItem('zugaClients', JSON.stringify(state.clients));
+        }
+
+        // Show toast message
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Generate a unique ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Format date as DD/MM/YYYY
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-GB');
+        }
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                // Create a simple service worker dynamically
+                const swContent = `
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open('zuga-fitness-v2').then(cache => {
+                                return cache.addAll([
+                                    './',
+                                    './index.html'
+                                ]);
+                            })
+                        );
+                    });
+
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request).then(response => {
+                                return response || fetch(event.request);
+                            })
+                        );
+                    });
+                `;
+
+                const blob = new Blob([swContent], { type: 'application/javascript' });
+                const swURL = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swURL)
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+
+    <!-- PWA Manifest -->
+    <script type="application/json" id="manifest">
+        {
+            "name": "Zuga Fitness Trainer",
+            "short_name": "Zuga Fitness",
+            "description": "Professional fitness trainer client management app",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#F8F9FF",
+            "theme_color": "#6C63FF",
+            "orientation": "portrait-primary",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiM2QzYzRkYiLz4KPHBhdGggZD0iTTk2IDU2QzEwNy4wNDYgNTYgMTE2IDY0Ljk1NDUgMTE2IDc2VjExNkMxMTYgMTI3LjA0NiAxMDcuMDQ2IDEzNiA5NiAxMzZDODQuOTU0NSAxMzYgNzYgMTI3LjA0NiA3NiAxMTZWNzZDNzYgNjQuOTU0NSA4NC45NTQ1IDU2IDk2IDU2WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTY0IDk2QzY0IDg0Ljk1NDUgNzIuOTU0NSA3NiA4NCA3NkgxMDhDMTE5LjA0NiA3NiAxMjggODQuOTU0NSAxMjggOTZWMTE2QzEyOCAxMjcuMDQ2IDExOS4wNDYgMTM2IDEwOCAxMzZIODRDNzIuOTU0NSAxMzYgNjQgMTI3LjA0NiA2NCAxMTZWOTZaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml"
+                },
+                {
+                    "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiM2QzYzRkYiLz4KPHBhdGggZD0iTTI1NiAxNDhDMjkxLjM0NyAxNDggMzIwIDE3Ni42NTMgMzIwIDIxMlYzMDhDMzIwIDM0My4zNDcgMjkxLjM0NyAzNzIgMjU2IDM3MkMyMjAuNjUzIDM3MiAxOTIgMzQzLjM0NyAxOTIgMzA4VjIxMkMxOTIgMTc2LjY1MyAyMjAuNjUzIDE0OCAyNTYgMTQ4WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE3MiAyNTZDMTcyIDI0NC45NTQgMTgwLjk1NCAyMzYgMTkyIDIzNkgyODhDMjk5LjA0NiAyMzYgMzA4IDI0NC45NTQgMzA4IDI1NlYzMDhDMzA4IDMxOS4wNDYgMjk5LjA0NiAzMjggMjg4IDMyOEgxOTJDMTgwLjk1NCAzMjggMTcyIDMxOS4wNDYgMTcyIDMwOFYyNTZaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K",
+                    "sizes": "512x512",
+                    "type": "image/svg+xml"
+                }
+            ]
+        }
+    </script>
+
+    <script>
+        // Create manifest link dynamically
+        const manifestContent = document.getElementById('manifest').textContent;
+        const manifestBlob = new Blob([manifestContent], { type: 'application/json' });
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        
+        const link = document.createElement('link');
+        link.rel = 'manifest';
+        link.href = manifestURL;
+        document.head.appendChild(link);
+    </script>
+</body>
+</html>
