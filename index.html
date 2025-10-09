@@ -244,6 +244,13 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
+            overflow: hidden;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         /* Login View */
@@ -291,7 +298,7 @@
         .app-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: white;
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -299,6 +306,14 @@
             margin: 0 auto 24px;
             font-size: 36px;
             box-shadow: var(--shadow);
+            overflow: hidden;
+            padding: 8px;
+        }
+
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         .register-link {
@@ -780,7 +795,9 @@
     <div id="loginView" class="view active">
         <div class="login-container">
             <div class="login-card card">
-                <div class="app-icon">💪</div>
+                <div class="app-icon">
+                    <img src="https://raw.githubusercontent.com/anuzuga123-alt/Zuga-Fitness-Trainer-App/main/photo_2025-03-07_22-31-00.jpg" alt="Zuga Fitness Logo">
+                </div>
                 <h1>Zuga Fitness</h1>
                 <p>Professional trainer client management</p>
                 
@@ -814,7 +831,9 @@
     <div id="registerView" class="view">
         <div class="login-container">
             <div class="login-card card">
-                <div class="app-icon">👤</div>
+                <div class="app-icon">
+                    <img src="https://raw.githubusercontent.com/anuzuga123-alt/Zuga-Fitness-Trainer-App/main/photo_2025-03-07_22-31-00.jpg" alt="Zuga Fitness Logo">
+                </div>
                 <h1>Join Zuga Fitness</h1>
                 <p>Create your trainer account</p>
                 
@@ -872,7 +891,9 @@
     <div id="dashboardView" class="view">
         <div class="header">
             <div class="logo">
-                <div class="logo-icon">💪</div>
+                <div class="logo-icon">
+                    <img src="https://raw.githubusercontent.com/anuzuga123-alt/Zuga-Fitness-Trainer-App/main/photo_2025-03-07_22-31-00.jpg" alt="Zuga Fitness Logo">
+                </div>
                 <span>Zuga Fitness</span>
             </div>
             <button class="btn btn-secondary btn-small" id="logoutBtn">Logout</button>
@@ -907,7 +928,9 @@
     <div id="clientView" class="view">
         <div class="header">
             <div class="logo">
-                <div class="logo-icon">🧘‍♀️</div>
+                <div class="logo-icon">
+                    <img src="https://raw.githubusercontent.com/anuzuga123-alt/Zuga-Fitness-Trainer-App/main/photo_2025-03-07_22-31-00.jpg" alt="Zuga Fitness Logo">
+                </div>
                 <span id="clientViewTitle">Client Profile</span>
             </div>
             <button class="btn btn-secondary btn-small" id="backToDashboardBtn">Back</button>
@@ -1005,7 +1028,7 @@
             
             <!-- Progress Section -->
             <div class="card">
-                <button class="btn btn-accent" id="downloadReportBtn" style="width: 100%;">📊 Download Monthly Report</button>
+                <button class="btn btn-accent" id="downloadReportBtn" style="width: 100%;">📊 Download Progress Report</button>
             </div>
         </div>
     </div>
@@ -1225,7 +1248,7 @@
             // Client View
             document.getElementById('editClientBtn').addEventListener('click', () => showEditClientForm());
             document.getElementById('saveDayInfoBtn').addEventListener('click', saveDayInfo);
-            document.getElementById('downloadReportBtn').addEventListener('click', downloadMonthlyReport);
+            document.getElementById('downloadReportBtn').addEventListener('click', downloadProgressReport);
             
             // Calendar Navigation
             document.getElementById('prevMonthBtn').addEventListener('click', prevMonth);
@@ -1803,19 +1826,23 @@
             showToast('Day info saved successfully');
         }
 
-        // Download monthly report
-        function downloadMonthlyReport() {
+        // Download progress report (from joining date to renewal date)
+        function downloadProgressReport() {
             if (!state.currentClient) return;
             
             // Create a simple report in a new window
             const reportWindow = window.open('', '_blank');
-            const monthYear = state.currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+            const joiningDate = new Date(state.currentClient.joiningDate);
+            const renewalDate = new Date(state.currentClient.renewalDate);
+            
+            // Format date range for title
+            const dateRange = `${joiningDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })} - ${renewalDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}`;
             
             let reportHTML = `
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Monthly Report - ${state.currentClient.name} - ${monthYear}</title>
+                    <title>Progress Report - ${state.currentClient.name}</title>
                     <style>
                         body { font-family: Arial, sans-serif; margin: 20px; }
                         h1 { color: #6C63FF; }
@@ -1833,8 +1860,8 @@
                     </style>
                 </head>
                 <body>
-                    <h1>Zuga Fitness - Monthly Report</h1>
-                    <h2>${state.currentClient.name} - ${monthYear}</h2>
+                    <h1>Zuga Fitness - Progress Report</h1>
+                    <h2>${state.currentClient.name} - ${dateRange}</h2>
                     
                     <h3>Client Details</h3>
                     <p><strong>Age:</strong> ${state.currentClient.age}</p>
@@ -1856,19 +1883,20 @@
                         <tbody>
             `;
             
-            // Get all dates in the current month
-            const firstDay = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth(), 1);
-            const lastDay = new Date(state.currentDate.getFullYear(), state.currentDate.getMonth() + 1, 0);
-            const daysInMonth = lastDay.getDate();
+            // Get all dates between joining and renewal
+            const startDate = new Date(joiningDate);
+            const endDate = new Date(renewalDate);
             
             let presentCount = 0;
             let absentCount = 0;
             let holidayCount = 0;
             let freezeCount = 0;
+            let totalDays = 0;
             
-            for (let day = 1; day <= daysInMonth; day++) {
-                const dateStr = `${state.currentDate.getFullYear()}-${(state.currentDate.getMonth() + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                const date = new Date(dateStr);
+            // Loop through each day in the date range
+            for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+                totalDays++;
+                const dateStr = date.toISOString().split('T')[0];
                 const dayData = state.currentClient.attendance ? state.currentClient.attendance[dateStr] : null;
                 
                 let status = 'Not Recorded';
@@ -1891,7 +1919,7 @@
                 
                 reportHTML += `
                     <tr>
-                        <td>${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</td>
+                        <td>${date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</td>
                         <td class="${statusClass}">${status}</td>
                         <td>${notes}</td>
                     </tr>
@@ -1907,7 +1935,8 @@
                     <p><strong>Absent:</strong> ${absentCount} days</p>
                     <p><strong>Holiday:</strong> ${holidayCount} days</p>
                     <p><strong>Freeze:</strong> ${freezeCount} days</p>
-                    <p><strong>Total Recorded:</strong> ${presentCount + absentCount + holidayCount + freezeCount} of ${daysInMonth} days</p>
+                    <p><strong>Total Recorded:</strong> ${presentCount + absentCount + holidayCount + freezeCount} of ${totalDays} days</p>
+                    <p><strong>Attendance Rate:</strong> ${Math.round((presentCount / totalDays) * 100)}%</p>
                     
                     <div class="no-print" style="margin-top: 30px;">
                         <button onclick="window.print()">Print Report</button>
@@ -1922,7 +1951,7 @@
             reportWindow.document.write(reportHTML);
             reportWindow.document.close();
             
-            showToast('Monthly report generated');
+            showToast('Progress report generated');
         }
 
         // Save clients to localStorage
