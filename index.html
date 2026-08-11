@@ -7,7 +7,14 @@
     <meta name="theme-color" content="#6C63FF">
     <meta name="description" content="Professional fitness trainer client management app">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💪</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        // Prevent FOUC (Flash of Unstyled Content)
+        (function() {
+            var savedTheme = sessionStorage.getItem('zuga_theme') || 'carbon';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
     <style>
         /* CSS Reset and Base Styles */
         * {
@@ -17,20 +24,45 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        :root {
+        :root, :root[data-theme="carbon"] {
+            --bg: #0A0E14;
+            --surface: rgba(21, 27, 35, 0.72);   /* glass cards */
+            --surface-solid: #151B23;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #E8EEF5;
+            --muted: #8B94A7;
+            --primary: #A3E635;                  /* volt lime */
+            --primary-contrast: #0A0E14;         /* DARK text on volt for accessibility */
+            --secondary: #22D3EE;                /* cyan */
+            --success: #4ADE80;
+            --danger: #F87171;
+            --warning: #FBBF24;
+            --info: #60A5FA;
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+            --glow: 0 0 24px rgba(163, 230, 53, 0.22);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        :root[data-theme="studio"] {
+            --bg: #F4F6FB;
+            --surface: rgba(255, 255, 255, 0.85);
+            --surface-solid: #FFFFFF;
+            --border: rgba(14, 20, 32, 0.08);
+            --text: #0E1420;
+            --muted: #5B6472;
             --primary: #6C63FF;
-            --primary-light: #8A85FF;
-            --primary-dark: #5752D4;
+            --primary-contrast: #FFFFFF;
             --secondary: #FF6584;
-            --accent: #36D1DC;
-            --white: #ffffff;
-            --light: #F8F9FF;
-            --light-gray: #EFF1F8;
-            --gray: #A0A3BD;
-            --dark-gray: #6E7191;
-            --text: #14142B;
-            --shadow: 0 10px 30px rgba(108, 99, 255, 0.15);
-            --shadow-light: 0 5px 15px rgba(108, 99, 255, 0.1);
+            --success: #16A34A;
+            --danger: #DC2626;
+            --warning: #D97706;
+            --info: #2563EB;
+            --shadow: 0 12px 40px rgba(14, 20, 32, 0.08);
+            --glow: 0 0 24px rgba(108, 99, 255, 0.18);
             --radius: 20px;
             --radius-sm: 12px;
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -39,13 +71,20 @@
         }
 
         body {
-            background: linear-gradient(135deg, #F8F9FF 0%, #EFF1F8 100%);
+            background-color: var(--bg);
             color: var(--text);
             line-height: 1.6;
             padding-top: var(--safe-area-top);
             padding-bottom: calc(80px + var(--safe-area-bottom));
             -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Typography Scopes: headings, stats, logo wordmark, and matrix day headers */
+        h1, h2, h3, .logo span, .stat-value, .header-date-day, .header-date span, .hub-card-title, .pin-modal-title, #pastModalTitle, #editClientTitle {
+            font-family: 'Space Grotesk', sans-serif !important;
+            font-weight: 700;
         }
 
         /* Common Components */
@@ -55,59 +94,45 @@
         }
 
         .card {
-            background: var(--white);
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 24px;
             margin-bottom: 20px;
             transition: var(--transition);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--border);
         }
 
         .card:hover {
-            box-shadow: 0 15px 40px rgba(108, 99, 255, 0.2);
+            box-shadow: var(--shadow);
             transform: translateY(-5px);
         }
 
         .btn {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
+            background: var(--primary);
+            color: var(--primary-contrast);
             border: none;
             border-radius: 50px;
             padding: 16px 28px;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--glow);
             touch-action: manipulation;
             min-height: 56px;
             position: relative;
             overflow: hidden;
         }
 
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .btn:hover::after, .btn:active::after {
-            opacity: 1;
-        }
-
-        .btn span {
-            position: relative;
-            z-index: 1;
+        .btn:hover, .btn:active {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
         }
 
         .btn:active {
@@ -115,19 +140,18 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, var(--secondary) 0%, #FF8FA0 100%);
+            background: var(--secondary);
+            color: #0A0E14; /* clean contrast */
+            box-shadow: none;
         }
 
-        .btn-secondary::after {
-            background: linear-gradient(135deg, #FF8FA0 0%, #FF4D6D 100%);
+        :root[data-theme="studio"] .btn-secondary {
+            color: #FFFFFF;
         }
 
         .btn-accent {
-            background: linear-gradient(135deg, var(--accent) 0%, #5B86E5 100%);
-        }
-
-        .btn-accent::after {
-            background: linear-gradient(135deg, #5B86E5 0%, #36D1DC 100%);
+            background: var(--info);
+            color: #ffffff;
         }
 
         .btn-small {
@@ -143,12 +167,9 @@
             box-shadow: none;
         }
 
-        .btn-outline::after {
-            background: var(--primary);
-        }
-
         .btn-outline:hover, .btn-outline:active {
-            color: white;
+            background: var(--primary);
+            color: var(--primary-contrast);
         }
 
         .form-group {
@@ -160,7 +181,7 @@
             display: block;
             margin-bottom: 10px;
             font-weight: 600;
-            color: var(--dark-gray);
+            color: var(--muted);
             font-size: 14px;
         }
 
@@ -171,12 +192,11 @@
         input, select, textarea {
             width: 100%;
             padding: 18px 20px;
-            border: 2px solid var(--light-gray);
+            border: 2px solid var(--border);
             border-radius: var(--radius-sm);
             font-size: 16px;
             transition: var(--transition);
-            -webkit-appearance: none;
-            background: var(--white);
+            background: var(--surface-solid);
             color: var(--text);
             font-weight: 500;
         }
@@ -184,7 +204,7 @@
         input:focus, select:focus, textarea:focus {
             border-color: var(--primary);
             outline: none;
-            box-shadow: 0 0 0 4px rgba(108, 99, 255, 0.15);
+            box-shadow: var(--glow);
         }
 
         .input-icon {
@@ -192,8 +212,14 @@
             right: 20px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--gray);
+            color: var(--muted);
             font-size: 20px;
+        }
+
+        /* Lock UX enhancements */
+        .locked {
+            opacity: 0.4 !important;
+            cursor: not-allowed !important;
         }
 
         /* Views */
@@ -213,8 +239,9 @@
 
         /* Header */
         .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
+            background: var(--surface-solid);
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
             padding: 20px;
             display: flex;
             align-items: center;
@@ -226,6 +253,27 @@
             padding-top: calc(20px + var(--safe-area-top));
         }
 
+        /* Round theme toggle button */
+        .theme-toggle-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-toggle-btn:hover {
+            background: var(--primary);
+            color: var(--primary-contrast);
+        }
+
         .logo {
             display: flex;
             align-items: center;
@@ -235,7 +283,8 @@
         }
 
         .logo-icon {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--surface);
+            border: 1px solid var(--border);
             width: 40px;
             height: 40px;
             border-radius: 12px;
@@ -285,7 +334,7 @@
             left: 0;
             width: 100%;
             height: 8px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             border-radius: var(--radius) var(--radius) 0 0;
         }
 
@@ -348,11 +397,13 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background: white;
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             padding: 30px 24px;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            border: 1px solid var(--border);
             transition: var(--transition);
             cursor: pointer;
             position: relative;
@@ -362,7 +413,8 @@
 
         .hub-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(108, 99, 255, 0.2);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
         }
 
         .hub-card-bg {
@@ -395,13 +447,19 @@
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            box-shadow: var(--shadow-light);
+            background: var(--primary);
+            color: var(--primary-contrast);
+            box-shadow: var(--glow);
         }
 
         .hub-card:nth-child(2) .hub-card-icon {
-            background: linear-gradient(135deg, var(--secondary) 0%, #FF8FA0 100%);
+            background: var(--secondary);
+            color: #0A0E14;
+            box-shadow: none;
+        }
+
+        :root[data-theme="studio"] .hub-card:nth-child(2) .hub-card-icon {
+            color: #FFFFFF;
         }
 
         .hub-card-title {
@@ -412,7 +470,7 @@
 
         .hub-card-desc {
             font-size: 14px;
-            color: var(--dark-gray);
+            color: var(--muted);
             margin-bottom: 20px;
             max-width: 80%;
         }
@@ -431,16 +489,10 @@
         }
 
         /* Lock mechanism styles */
-        .btn:disabled, .btn.locked-btn {
+        .locked {
             opacity: 0.4 !important;
-            pointer-events: none !important;
             cursor: not-allowed !important;
-        }
-
-        .locked-btn-pt {
-            opacity: 0.4 !important;
-            pointer-events: none !important;
-            cursor: not-allowed !important;
+            pointer-events: auto !important;
         }
 
         /* Sticky Matrix Table */
@@ -448,10 +500,10 @@
             width: 100%;
             overflow-x: auto;
             border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-light);
-            background: var(--white);
+            box-shadow: var(--shadow);
+            background: var(--surface-solid);
             margin-bottom: 20px;
-            border: 1px solid var(--light-gray);
+            border: 1px solid var(--border);
             -webkit-overflow-scrolling: touch;
         }
 
@@ -464,7 +516,7 @@
         .matrix-table th, .matrix-table td {
             padding: 14px 16px;
             text-align: center;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 1px solid var(--border);
         }
 
         /* Sticky left column containing client names */
@@ -472,10 +524,11 @@
             position: -webkit-sticky;
             position: sticky;
             left: 0;
-            background: var(--white);
+            background: var(--surface-solid);
+            color: var(--text);
             z-index: 2;
             text-align: left;
-            box-shadow: 4px 0 8px rgba(0,0,0,0.05);
+            box-shadow: 4px 0 8px rgba(0,0,0,0.15);
             font-weight: 600;
             min-width: 140px;
             max-width: 180px;
@@ -484,13 +537,18 @@
             text-overflow: ellipsis;
         }
 
+        :root[data-theme="studio"] .matrix-table th.sticky-col,
+        :root[data-theme="studio"] .matrix-table td.sticky-col {
+            box-shadow: 4px 0 8px rgba(14,20,32,0.05);
+        }
+
         .matrix-table th.sticky-col {
-            background: var(--light-gray);
+            background: var(--surface-solid);
             z-index: 3;
         }
 
         .matrix-table tr:hover td.sticky-col {
-            background: var(--light) !important;
+            background: var(--surface) !important;
         }
 
         .matrix-cell-status {
@@ -506,18 +564,18 @@
         }
 
         .matrix-cell-status:hover {
-            background: var(--light-gray);
+            background: var(--surface);
             transform: scale(1.1);
         }
 
         .matrix-cell-status.empty {
-            color: var(--gray);
+            color: var(--muted);
             font-size: 14px;
         }
 
         .header-date {
             font-size: 12px;
-            color: var(--dark-gray);
+            color: var(--muted);
             font-weight: 600;
             white-space: nowrap;
         }
@@ -529,8 +587,10 @@
         }
 
         .header-date.today-col {
-            background: rgba(108, 99, 255, 0.08);
+            background: var(--surface);
+            border: 1px solid var(--primary);
             border-radius: var(--radius-sm);
+            padding: 4px 8px;
         }
 
         /* Quick Check-In List View */
@@ -560,18 +620,18 @@
 
         /* Status Styling for Toggling rows */
         .checkin-item.status-unrecorded {
-            background: var(--white);
-            border-color: var(--light-gray);
+            background: var(--surface);
+            border-color: var(--border);
         }
 
         .checkin-item.status-present {
-            background: rgba(76, 175, 80, 0.08);
-            border-color: rgba(76, 175, 80, 0.3);
+            background: rgba(74, 222, 128, 0.08);
+            border-color: var(--success);
         }
 
         .checkin-item.status-absent {
-            background: rgba(244, 67, 54, 0.08);
-            border-color: rgba(244, 67, 54, 0.3);
+            background: rgba(248, 113, 113, 0.08);
+            border-color: var(--danger);
         }
 
         .checkin-name {
@@ -590,18 +650,19 @@
         }
 
         .checkin-badge-unrecorded {
-            background: var(--light-gray);
-            color: var(--dark-gray);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
         }
 
         .checkin-badge-present {
-            background: rgba(76, 175, 80, 0.15);
-            color: #2e7d32;
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success);
         }
 
         .checkin-badge-absent {
-            background: rgba(244, 67, 54, 0.15);
-            color: #c62828;
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--danger);
         }
 
         /* Gym PIN Modal styling */
@@ -690,21 +751,44 @@
 
         /* Padlock trigger in header */
         .padlock-trigger {
-            font-size: 22px;
+            font-size: 18px;
             cursor: pointer;
-            padding: 6px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             transition: var(--transition);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
             margin-left: 10px;
         }
 
         .padlock-trigger:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: var(--primary);
+            color: var(--primary-contrast);
             transform: scale(1.1);
+        }
+
+        /* Demo PIN Hint Chip styling */
+        .hint-chip {
+            display: inline-block;
+            background: rgba(163, 230, 53, 0.15);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 13px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(163, 230, 53, 0.3);
+        }
+
+        :root[data-theme="studio"] .hint-chip {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--primary);
+            border: 1px solid rgba(108, 99, 255, 0.2);
         }
 
         /* Dashboard View */
@@ -731,16 +815,22 @@
         }
 
         .stat-card {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
+            background: var(--primary);
+            color: var(--primary-contrast);
             border-radius: var(--radius);
             padding: 20px;
             text-align: center;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--shadow);
         }
 
         .stat-card:nth-child(2) {
-            background: linear-gradient(135deg, var(--secondary) 0%, #FF8FA0 100%);
+            background: var(--secondary);
+            color: #0A0E14;
+            box-shadow: none;
+        }
+
+        :root[data-theme="studio"] .stat-card:nth-child(2) {
+            color: #FFFFFF;
         }
 
         .stat-value {
@@ -760,7 +850,7 @@
 
         .client-item {
             padding: 20px;
-            border-bottom: 1px solid var(--light-gray);
+            border: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -768,12 +858,14 @@
             transition: var(--transition);
             border-radius: var(--radius-sm);
             margin-bottom: 12px;
-            background: var(--white);
-            box-shadow: var(--shadow-light);
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--shadow);
         }
 
         .client-item:active {
-            background: var(--light);
+            background: var(--surface-solid);
             transform: scale(0.995);
         }
 
@@ -786,8 +878,8 @@
             width: 56px;
             height: 56px;
             border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-            color: white;
+            background: var(--primary);
+            color: var(--primary-contrast);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -795,7 +887,7 @@
             margin-right: 16px;
             flex-shrink: 0;
             font-size: 20px;
-            box-shadow: var(--shadow-light);
+            box-shadow: var(--glow);
         }
 
         .client-info {
@@ -810,7 +902,7 @@
 
         .client-details {
             font-size: 14px;
-            color: var(--dark-gray);
+            color: var(--muted);
             display: flex;
             align-items: center;
             gap: 12px;
@@ -823,8 +915,9 @@
             font-size: 12px;
             padding: 4px 10px;
             border-radius: 20px;
-            background: var(--light);
-            color: var(--dark-gray);
+            background: var(--surface-solid);
+            border: 1px solid var(--border);
+            color: var(--muted);
         }
 
         /* Client Profile View */
@@ -842,12 +935,12 @@
             justify-content: space-between;
             margin-bottom: 16px;
             padding-bottom: 16px;
-            border-bottom: 1px solid var(--light-gray);
+            border-bottom: 1px solid var(--border);
         }
 
         .detail-label {
             font-weight: 600;
-            color: var(--dark-gray);
+            color: var(--muted);
             font-size: 14px;
         }
 
@@ -892,7 +985,7 @@
             text-align: center;
             font-weight: 600;
             font-size: 12px;
-            color: var(--dark-gray);
+            color: var(--muted);
             padding: 12px 0;
         }
 
@@ -911,7 +1004,9 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            background: var(--light);
+            background: var(--surface-solid);
+            color: var(--text);
+            border: 1px solid var(--border);
             font-size: 14px;
             touch-action: manipulation;
             position: relative;
@@ -922,29 +1017,34 @@
         }
 
         .calendar-day.selected {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
-            box-shadow: var(--shadow-light);
+            background: var(--primary);
+            color: var(--primary-contrast);
+            box-shadow: var(--glow);
+            border-color: var(--primary);
         }
 
         .calendar-day.present {
-            background: #4caf50;
+            background: var(--success);
             color: white;
+            border-color: var(--success);
         }
 
         .calendar-day.absent {
-            background: #f44336;
+            background: var(--danger);
             color: white;
+            border-color: var(--danger);
         }
 
         .calendar-day.holiday {
-            background: #ff9800;
+            background: var(--warning);
             color: white;
+            border-color: var(--warning);
         }
 
         .calendar-day.freeze {
-            background: #2196f3;
+            background: var(--info);
             color: white;
+            border-color: var(--info);
         }
 
         .calendar-day.empty {
@@ -1000,18 +1100,19 @@
             width: 64px;
             height: 64px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white;
+            background: var(--primary);
+            color: var(--primary-contrast);
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: var(--shadow);
+            box-shadow: var(--glow);
             cursor: pointer;
             z-index: 100;
             transition: var(--transition);
             font-size: 24px;
             touch-action: manipulation;
             bottom: calc(24px + var(--safe-area-bottom));
+            border: 1px solid var(--border);
         }
 
         .floating-home:active {
@@ -1052,14 +1153,14 @@
         .install-icon {
             font-size: 28px;
             flex-shrink: 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             width: 50px;
             height: 50px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--primary-contrast);
         }
 
         .install-text {
@@ -1100,7 +1201,7 @@
         .page-loader {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(10, 14, 20, 0.85);
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -1108,6 +1209,10 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s ease;
+        }
+
+        :root[data-theme="studio"] .page-loader {
+            background: rgba(244, 246, 251, 0.85);
         }
 
         .page-loader.show {
@@ -1126,7 +1231,7 @@
         .empty-state {
             text-align: center;
             padding: 40px 20px;
-            color: var(--dark-gray);
+            color: var(--muted);
         }
 
         .empty-icon {
@@ -1207,15 +1312,19 @@
 
     <!-- Gym PIN Modal -->
     <div id="gymPinModal" class="pin-modal-backdrop">
-        <div class="pin-modal-content">
-            <div class="pin-modal-icon">🔒</div>
-            <div class="pin-modal-title">Gym Access Lock</div>
-            <div class="pin-modal-desc">Type the Gym PIN to unlock Trainer Staff Mode (Add / Edit clients, log attendance, etc.)</div>
+        <div class="pin-modal-content" style="background: var(--surface-solid); border: 1px solid var(--border);">
+            <div class="pin-modal-icon" style="color: var(--primary);">🔒</div>
+            <div class="pin-modal-title" style="color: var(--text);">Gym Access Lock</div>
+            <div class="pin-modal-desc" style="color: var(--muted);">Type the Gym PIN to unlock Trainer Staff Mode (Add / Edit clients, log attendance, etc.)</div>
+
+            <!-- Hint Chip for Demo PIN -->
+            <div class="hint-chip">Demo PIN: 1234</div>
+
             <div class="pin-input-container">
-                <input type="password" id="pin1" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
-                <input type="password" id="pin2" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
-                <input type="password" id="pin3" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
-                <input type="password" id="pin4" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off">
+                <input type="password" id="pin1" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="border: 2px solid var(--border); background: var(--surface);">
+                <input type="password" id="pin2" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="border: 2px solid var(--border); background: var(--surface);">
+                <input type="password" id="pin3" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="border: 2px solid var(--border); background: var(--surface);">
+                <input type="password" id="pin4" class="pin-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="off" style="border: 2px solid var(--border); background: var(--surface);">
             </div>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-secondary btn-small" id="dismissPinBtn" style="flex: 1;">Dismiss (View-Only)</button>
@@ -1226,9 +1335,9 @@
 
     <!-- Past Attendance Mini Modal -->
     <div id="pastAttendanceModal" class="pin-modal-backdrop">
-        <div class="pin-modal-content" style="max-width: 350px;">
-            <div class="pin-modal-title" id="pastModalTitle">Edit Past Attendance</div>
-            <div class="pin-modal-desc" id="pastModalDesc" style="margin-bottom: 15px;">Dr. Keerthidaa on 12 Oct</div>
+        <div class="pin-modal-content" style="max-width: 350px; background: var(--surface-solid); border: 1px solid var(--border);">
+            <div class="pin-modal-title" id="pastModalTitle" style="color: var(--text);">Edit Past Attendance</div>
+            <div class="pin-modal-desc" id="pastModalDesc" style="margin-bottom: 15px; color: var(--muted);">Dr. G. Keerthidaa on 12 Oct</div>
             <div class="form-group" style="text-align: left;">
                 <label for="pastAttendanceSelect">Attendance Status</label>
                 <select id="pastAttendanceSelect">
@@ -1355,9 +1464,10 @@
                 </div>
                 <span>Zuga Fitness Hub</span>
             </div>
-            <div style="display: flex; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="theme-toggle-btn" title="Toggle Theme">☀️</button>
                 <div class="padlock-trigger" id="headerPadlock" title="Toggle Staff Mode">🔒</div>
-                <button class="btn btn-secondary btn-small" id="hubLogoutBtn" style="margin-left: 10px;">Logout</button>
+                <button class="btn btn-secondary btn-small" id="hubLogoutBtn">Logout</button>
             </div>
         </div>
 
@@ -1410,16 +1520,17 @@
                 </div>
                 <span>Zuga PT</span>
             </div>
-            <div style="display: flex; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="theme-toggle-btn" title="Toggle Theme">☀️</button>
                 <div class="padlock-trigger" id="ptPadlock" title="Toggle Staff Mode">🔒</div>
-                <button class="btn btn-secondary btn-small" id="logoutBtn" style="margin-left: 10px;">Logout</button>
+                <button class="btn btn-secondary btn-small" id="logoutBtn">Logout</button>
             </div>
         </div>
         
         <div class="container">
             <div class="dashboard-header">
                 <h2 class="dashboard-title">PT Clients</h2>
-                <button class="btn locked-btn" id="addClientBtn">+ Add PT Client</button>
+                <button class="btn locked" id="addClientBtn">+ Add PT Client</button>
             </div>
             
             <div class="stats-container">
@@ -1450,9 +1561,10 @@
                 </div>
                 <span>Zuga Groups</span>
             </div>
-            <div style="display: flex; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="theme-toggle-btn" title="Toggle Theme">☀️</button>
                 <div class="padlock-trigger" id="groupPadlock" title="Toggle Staff Mode">🔒</div>
-                <button class="btn btn-secondary btn-small" id="groupLogoutBtnHeader" style="margin-left: 10px;">Logout</button>
+                <button class="btn btn-secondary btn-small" id="groupLogoutBtnHeader">Logout</button>
             </div>
         </div>
 
@@ -1460,8 +1572,8 @@
             <div class="dashboard-header">
                 <h2 class="dashboard-title" id="classNameTitle">6 AM Power Yoga</h2>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-small" id="toggleCheckInModeBtn">⚡ Quick Check-In</button>
-                    <button class="btn btn-small btn-secondary locked-btn" id="addGroupClientBtn">+ Add To Class</button>
+                    <button class="btn btn-small locked" id="toggleCheckInModeBtn">⚡ Quick Check-In</button>
+                    <button class="btn btn-small btn-secondary locked" id="addGroupClientBtn">+ Add To Class</button>
                 </div>
             </div>
 
@@ -1496,7 +1608,7 @@
                     <!-- Check-in rows will go here -->
                 </ul>
 
-                <button class="btn locked-btn" id="saveBatchCheckInBtn" style="width: 100%;">Save Batch Check-In</button>
+                <button class="btn locked" id="saveBatchCheckInBtn" style="width: 100%;">Save Batch Check-In</button>
                 <button class="btn btn-outline btn-small" id="cancelCheckInBtn" style="width: 100%; margin-top: 10px;">Cancel & Go Back</button>
             </div>
         </div>
@@ -1511,14 +1623,17 @@
                 </div>
                 <span id="clientViewTitle">Client Profile</span>
             </div>
-            <button class="btn btn-secondary btn-small" id="backToDashboardBtn">Back</button>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button class="theme-toggle-btn" title="Toggle Theme">☀️</button>
+                <button class="btn btn-secondary btn-small" id="backToDashboardBtn">Back</button>
+            </div>
         </div>
         
         <div class="container">
             <!-- Client Info Section -->
             <div class="client-header">
                 <h2 id="clientName">Client Name</h2>
-                <button class="btn btn-small locked-btn" id="editClientBtn">Edit Profile</button>
+                <button class="btn btn-small locked" id="editClientBtn">Edit Profile</button>
             </div>
             
             <div class="card" id="clientInfoCard">
@@ -1553,6 +1668,32 @@
                 <div class="client-detail-row">
                     <div class="detail-label">Injuries</div>
                     <div class="detail-value" id="clientInjuries">-</div>
+                </div>
+
+                <!-- Lifestyle & Assessment Fields -->
+                <div class="client-detail-row">
+                    <div class="detail-label">Occupation</div>
+                    <div class="detail-value" id="clientOccupation">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Primary Goals</div>
+                    <div class="detail-value" id="clientGoals">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Diet</div>
+                    <div class="detail-value" id="clientDiet">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Sleep</div>
+                    <div class="detail-value" id="clientSleep">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Stress Level</div>
+                    <div class="detail-value" id="clientStress">-</div>
+                </div>
+                <div class="client-detail-row">
+                    <div class="detail-label">Supplements</div>
+                    <div class="detail-value" id="clientSupplements">-</div>
                 </div>
             </div>
             
@@ -1601,7 +1742,7 @@
                     <textarea id="workoutNotes" rows="3" placeholder="Enter today's workout details, progress, or any notes"></textarea>
                 </div>
                 
-                <button class="btn locked-btn" id="saveDayInfoBtn" style="width: 100%;">Save Day Info</button>
+                <button class="btn locked" id="saveDayInfoBtn" style="width: 100%;">Save Day Info</button>
             </div>
             
             <!-- Progress Section -->
@@ -1666,6 +1807,37 @@
                     <label for="editClientInjuries">Injuries</label>
                     <input type="text" id="editClientInjuries" placeholder="Any injuries">
                 </div>
+
+                <!-- Collapsible Lifestyle Assessment Fields -->
+                <details style="margin-bottom: 24px; text-align: left;">
+                    <summary style="font-weight: 600; color: var(--primary); cursor: pointer; padding: 6px 0;">Lifestyle & Assessment (optional)</summary>
+                    <div style="padding-top: 15px; border-top: 1px dashed var(--border);">
+                        <div class="form-group">
+                            <label for="editClientOccupation">Occupation</label>
+                            <input type="text" id="editClientOccupation" placeholder="e.g. Dentist">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientGoals">Primary Goals</label>
+                            <input type="text" id="editClientGoals" placeholder="e.g. weight loss / fat loss / strength">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientDiet">Diet</label>
+                            <input type="text" id="editClientDiet" placeholder="e.g. Pure Veg">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientSleep">Sleep</label>
+                            <input type="text" id="editClientSleep" placeholder="e.g. 5-6 hrs">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientStress">Stress Level</label>
+                            <input type="text" id="editClientStress" placeholder="e.g. high stress">
+                        </div>
+                        <div class="form-group">
+                            <label for="editClientSupplements">Supplements</label>
+                            <input type="text" id="editClientSupplements" placeholder="e.g. Vitamin D + Magnesium">
+                        </div>
+                    </div>
+                </details>
                 
                 <div style="display: flex; gap: 10px;">
                     <button class="btn" id="saveClientBtn" style="flex: 1;">Save Changes</button>
@@ -1730,6 +1902,37 @@
                     <label for="newClientInjuries">Injuries</label>
                     <input type="text" id="newClientInjuries" placeholder="Any injuries">
                 </div>
+
+                <!-- Collapsible Lifestyle Assessment Fields -->
+                <details style="margin-bottom: 24px; text-align: left;">
+                    <summary style="font-weight: 600; color: var(--primary); cursor: pointer; padding: 6px 0;">Lifestyle & Assessment (optional)</summary>
+                    <div style="padding-top: 15px; border-top: 1px dashed var(--border);">
+                        <div class="form-group">
+                            <label for="newClientOccupation">Occupation</label>
+                            <input type="text" id="newClientOccupation" placeholder="e.g. Dentist">
+                        </div>
+                        <div class="form-group">
+                            <label for="newClientGoals">Primary Goals</label>
+                            <input type="text" id="newClientGoals" placeholder="e.g. weight loss / fat loss / strength">
+                        </div>
+                        <div class="form-group">
+                            <label for="newClientDiet">Diet</label>
+                            <input type="text" id="newClientDiet" placeholder="e.g. Pure Veg">
+                        </div>
+                        <div class="form-group">
+                            <label for="newClientSleep">Sleep</label>
+                            <input type="text" id="newClientSleep" placeholder="e.g. 5-6 hrs">
+                        </div>
+                        <div class="form-group">
+                            <label for="newClientStress">Stress Level</label>
+                            <input type="text" id="newClientStress" placeholder="e.g. high stress">
+                        </div>
+                        <div class="form-group">
+                            <label for="newClientSupplements">Supplements</label>
+                            <input type="text" id="newClientSupplements" placeholder="e.g. Vitamin D + Magnesium">
+                        </div>
+                    </div>
+                </details>
                 
                 <div style="display: flex; gap: 10px;">
                     <button class="btn" id="saveNewClientBtn" style="flex: 1;">Add Client</button>
@@ -1798,7 +2001,7 @@
             currentGroupClass: null, // Holds the active group class details
             currentDate: new Date(),
             selectedDate: null,
-            isUnlocked: false, // For Gym PIN lock
+            isUnlocked: sessionStorage.getItem('zuga_staff_unlocked') === 'true', // For Gym PIN lock, persisted
 
             // Temporary quick check-in state
             checkInAttendance: {}, // clientId: status ('present', 'absent', '')
@@ -1825,13 +2028,32 @@
 
         // Initialize the app
         async function initApp() {
+            // Check theme, sync state of toggle indicator button
+            const savedTheme = sessionStorage.getItem('zuga_theme') || 'carbon';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggleButton(savedTheme);
+
+            // Call mockApi.init to bootstrap the seed data
+            showLoader(true);
+            try {
+                await mockApi.init();
+            } catch (err) {
+                console.error("mockApi.init failed", err);
+            }
+            showLoader(false);
+
             // Check session state for logged-in trainer
             const currentTrainer = mockApi.getCurrentTrainer();
             if (currentTrainer) {
                 state.currentTrainer = currentTrainer;
                 showView('hub');
-                // Trigger lock PIN prompt on first Hub entry
-                triggerPinModal();
+
+                // Trigger lock PIN prompt on first Hub entry per session
+                const alreadyPrompted = sessionStorage.getItem('zuga_pin_prompted') === 'true';
+                if (!state.isUnlocked && !alreadyPrompted) {
+                    sessionStorage.setItem('zuga_pin_prompted', 'true');
+                    triggerPinModal();
+                }
             } else {
                 showView('login');
             }
@@ -1840,6 +2062,8 @@
             setupEventListeners();
             setupGymPinListeners();
             setupPastModalListeners();
+            setupThemeToggleListeners();
+            setupLockInterceptListeners();
             
             // Set default dates for PT forms
             const todayStr = new Date().toISOString().split('T')[0];
@@ -1922,6 +2146,7 @@
 
             if (pin === '1234') {
                 state.isUnlocked = true;
+                sessionStorage.setItem('zuga_staff_unlocked', 'true');
                 document.getElementById('gymPinModal').classList.remove('show');
                 applyLockState();
                 showToast('Staff Mode Active');
@@ -1946,17 +2171,71 @@
                 }
             });
 
-            // Find all buttons marked as locked-btn
-            const editButtons = document.querySelectorAll('.locked-btn');
-            editButtons.forEach(btn => {
-                if (state.isUnlocked) {
-                    btn.disabled = false;
-                    btn.classList.remove('locked-btn-pt');
-                } else {
-                    btn.disabled = true;
-                    btn.classList.add('locked-btn-pt');
+            // Handle .locked elements: we manage styling by adding/removing classes
+            const lockedElements = document.querySelectorAll('.btn, .matrix-cell-status, .checkin-item');
+            // We also want to target any custom locked classes if needed, but our CSS rules .locked to represent locked state.
+            // Let's ensure the locked buttons and elements get the '.locked' class appropriately based on state.isUnlocked.
+            // Wait, the prompt says "Give locked buttons a .locked class (opacity 0.4) that REMAINS CLICKABLE; on click, intercept and open the PIN modal".
+            // So we'll assign '.locked' class when !state.isUnlocked, and remove it when state.isUnlocked.
+            const buttonsToLock = [
+                document.getElementById('addClientBtn'),
+                document.getElementById('addGroupClientBtn'),
+                document.getElementById('saveBatchCheckInBtn'),
+                document.getElementById('editClientBtn'),
+                document.getElementById('saveDayInfoBtn'),
+                document.getElementById('toggleCheckInModeBtn') // consistent lock on Quick Check-In
+            ];
+
+            buttonsToLock.forEach(btn => {
+                if (btn) {
+                    if (state.isUnlocked) {
+                        btn.classList.remove('locked');
+                        btn.removeAttribute('aria-disabled');
+                    } else {
+                        btn.classList.add('locked');
+                        btn.setAttribute('aria-disabled', 'true');
+                    }
                 }
             });
+        }
+
+        // Theme toggle initialization and listeners
+        function setupThemeToggleListeners() {
+            const toggles = document.querySelectorAll('.theme-toggle-btn');
+            toggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const currentTheme = sessionStorage.getItem('zuga_theme') || 'carbon';
+                    const nextTheme = currentTheme === 'carbon' ? 'studio' : 'carbon';
+                    sessionStorage.setItem('zuga_theme', nextTheme);
+                    document.documentElement.setAttribute('data-theme', nextTheme);
+                    updateThemeToggleButton(nextTheme);
+                    showToast(`Theme switched to ${nextTheme === 'carbon' ? 'Carbon & Volt' : 'Studio'}`);
+                });
+            });
+        }
+
+        function updateThemeToggleButton(theme) {
+            const toggles = document.querySelectorAll('.theme-toggle-btn');
+            toggles.forEach(toggle => {
+                if (theme === 'carbon') {
+                    toggle.textContent = '☀️'; // Show sun to toggle to light
+                } else {
+                    toggle.textContent = '🌙'; // Show moon to toggle to dark
+                }
+            });
+        }
+
+        // Lock UX Click Interception
+        function setupLockInterceptListeners() {
+            document.addEventListener('click', (e) => {
+                const lockedBtn = e.target.closest('.locked');
+                if (lockedBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    triggerPinModal();
+                    showToast('🔒 Staff PIN required (demo: 1234)');
+                }
+            }, true); // Use capturing phase to intercept before normal action
         }
 
         // Set up all view navigation event listeners
@@ -1980,7 +2259,7 @@
 
             // PT Dashboard View
             document.getElementById('addClientBtn').addEventListener('click', () => {
-                if (!state.isUnlocked) return showToast('Please enter the Gym PIN first.');
+                if (!state.isUnlocked) return; // intercepted anyway
                 showView('addClient');
             });
             document.getElementById('backToDashboardBtn').addEventListener('click', () => {
@@ -1989,7 +2268,7 @@
 
             // PT Client Profile View
             document.getElementById('editClientBtn').addEventListener('click', () => {
-                if (!state.isUnlocked) return showToast('Please enter Gym PIN to edit profiles.');
+                if (!state.isUnlocked) return; // intercepted anyway
                 showEditClientForm();
             });
             document.getElementById('saveDayInfoBtn').addEventListener('click', saveDayInfo);
@@ -2007,7 +2286,7 @@
 
             // Group Class Addition Forms
             document.getElementById('addGroupClientBtn').addEventListener('click', async () => {
-                if (!state.isUnlocked) return showToast('Please enter the Gym PIN first.');
+                if (!state.isUnlocked) return; // intercepted anyway
                 showView('addGroupClient');
                 // Load existing client dropdown from registry
                 await loadExistingClientsRegistryDropdown();
@@ -2032,7 +2311,10 @@
             });
 
             // Quick Check-In Toggles
-            document.getElementById('toggleCheckInModeBtn').addEventListener('click', toggleQuickCheckInView);
+            document.getElementById('toggleCheckInModeBtn').addEventListener('click', () => {
+                if (!state.isUnlocked) return; // intercepted
+                toggleQuickCheckInView();
+            });
             document.getElementById('cancelCheckInBtn').addEventListener('click', () => {
                 document.getElementById('quickCheckInUI').style.display = 'none';
                 document.getElementById('stickyMatrixUI').style.display = 'block';
@@ -2095,7 +2377,11 @@
             if (res.success) {
                 state.currentTrainer = res.trainer;
                 await showView('hub');
-                triggerPinModal();
+                const alreadyPrompted = sessionStorage.getItem('zuga_pin_prompted') === 'true';
+                if (!state.isUnlocked && !alreadyPrompted) {
+                    sessionStorage.setItem('zuga_pin_prompted', 'true');
+                    triggerPinModal();
+                }
                 showToast(`Welcome, ${res.trainer.name}!`);
             } else {
                 showToast(res.error || 'Login failed.');
@@ -2135,7 +2421,11 @@
             if (res.success) {
                 state.currentTrainer = res.trainer;
                 await showView('hub');
-                triggerPinModal();
+                const alreadyPrompted = sessionStorage.getItem('zuga_pin_prompted') === 'true';
+                if (!state.isUnlocked && !alreadyPrompted) {
+                    sessionStorage.setItem('zuga_pin_prompted', 'true');
+                    triggerPinModal();
+                }
                 showToast(`Account created successfully! Welcome, ${name}`);
             } else {
                 showToast(res.error || 'Registration failed.');
@@ -2153,6 +2443,8 @@
             state.currentTrainer = null;
             state.isUnlocked = false;
             sessionStorage.removeItem('currentTrainer');
+            sessionStorage.removeItem('zuga_staff_unlocked');
+            sessionStorage.removeItem('zuga_pin_prompted');
             showView('login');
             showLoader(false);
             showToast('Logged out successfully');
@@ -2232,6 +2524,14 @@
             document.getElementById('clientMedical').textContent = state.currentClient.medicalCondition || '-';
             document.getElementById('clientInjuries').textContent = state.currentClient.injuries || '-';
 
+            // Lifestyle Assessment Fields
+            document.getElementById('clientOccupation').textContent = state.currentClient.occupation || '-';
+            document.getElementById('clientGoals').textContent = state.currentClient.goals || '-';
+            document.getElementById('clientDiet').textContent = state.currentClient.diet || '-';
+            document.getElementById('clientSleep').textContent = state.currentClient.sleep || '-';
+            document.getElementById('clientStress').textContent = state.currentClient.stress || '-';
+            document.getElementById('clientSupplements').textContent = state.currentClient.supplements || '-';
+
             if (!state.selectedDate) {
                 state.selectedDate = new Date().toISOString().split('T')[0];
             }
@@ -2252,6 +2552,14 @@
             document.getElementById('editClientMedical').value = state.currentClient.medicalCondition || '';
             document.getElementById('editClientInjuries').value = state.currentClient.injuries || '';
 
+            // Lifestyle Assessment Fields
+            document.getElementById('editClientOccupation').value = state.currentClient.occupation || '';
+            document.getElementById('editClientGoals').value = state.currentClient.goals || '';
+            document.getElementById('editClientDiet').value = state.currentClient.diet || '';
+            document.getElementById('editClientSleep').value = state.currentClient.sleep || '';
+            document.getElementById('editClientStress').value = state.currentClient.stress || '';
+            document.getElementById('editClientSupplements').value = state.currentClient.supplements || '';
+
             showView('editClient');
         }
 
@@ -2269,6 +2577,14 @@
             const medicalCondition = document.getElementById('editClientMedical').value;
             const injuries = document.getElementById('editClientInjuries').value;
 
+            // Lifestyle Assessment Fields
+            const occupation = document.getElementById('editClientOccupation').value;
+            const goals = document.getElementById('editClientGoals').value;
+            const diet = document.getElementById('editClientDiet').value;
+            const sleep = document.getElementById('editClientSleep').value;
+            const stress = document.getElementById('editClientStress').value;
+            const supplements = document.getElementById('editClientSupplements').value;
+
             if (!name || !age || !gender || !joiningDate || !renewalDate) {
                 showToast('Please fill all required fields');
                 return;
@@ -2277,7 +2593,8 @@
             showLoader(true);
             const updated = {
                 id: state.currentClient.id,
-                name, age, gender, joiningDate, renewalDate, height, weight, medicalCondition, injuries
+                name, age, gender, joiningDate, renewalDate, height, weight, medicalCondition, injuries,
+                occupation, goals, diet, sleep, stress, supplements
             };
 
             const res = await mockApi.updateClient(updated);
@@ -2304,6 +2621,14 @@
             const medicalCondition = document.getElementById('newClientMedical').value;
             const injuries = document.getElementById('newClientInjuries').value;
 
+            // Lifestyle Assessment Fields
+            const occupation = document.getElementById('newClientOccupation').value;
+            const goals = document.getElementById('newClientGoals').value;
+            const diet = document.getElementById('newClientDiet').value;
+            const sleep = document.getElementById('newClientSleep').value;
+            const stress = document.getElementById('newClientStress').value;
+            const supplements = document.getElementById('newClientSupplements').value;
+
             if (!name || !age || !gender || !joiningDate || !renewalDate) {
                 showToast('Please fill all required fields');
                 return;
@@ -2311,7 +2636,8 @@
 
             showLoader(true);
             const clientData = {
-                name, age, gender, joiningDate, renewalDate, height, weight, medicalCondition, injuries
+                name, age, gender, joiningDate, renewalDate, height, weight, medicalCondition, injuries,
+                occupation, goals, diet, sleep, stress, supplements
             };
 
             const res = await mockApi.addPTClient(state.currentTrainer.id, clientData);
@@ -2328,6 +2654,14 @@
                 document.getElementById('newClientWeight').value = '';
                 document.getElementById('newClientMedical').value = '';
                 document.getElementById('newClientInjuries').value = '';
+
+                // Clear optional inputs
+                document.getElementById('newClientOccupation').value = '';
+                document.getElementById('newClientGoals').value = '';
+                document.getElementById('newClientDiet').value = '';
+                document.getElementById('newClientSleep').value = '';
+                document.getElementById('newClientStress').value = '';
+                document.getElementById('newClientSupplements').value = '';
             } else {
                 showToast('Failed to add client.');
             }
@@ -2485,6 +2819,12 @@
                     <p><strong>Weight:</strong> ${state.currentClient.weight || 'N/A'} kg</p>
                     <p><strong>Medical Conditions:</strong> ${state.currentClient.medicalCondition || 'None'}</p>
                     <p><strong>Injuries:</strong> ${state.currentClient.injuries || 'None'}</p>
+                    <p><strong>Occupation:</strong> ${state.currentClient.occupation || 'N/A'}</p>
+                    <p><strong>Primary Goals:</strong> ${state.currentClient.goals || 'N/A'}</p>
+                    <p><strong>Diet:</strong> ${state.currentClient.diet || 'N/A'}</p>
+                    <p><strong>Sleep:</strong> ${state.currentClient.sleep || 'N/A'}</p>
+                    <p><strong>Stress Level:</strong> ${state.currentClient.stress || 'N/A'}</p>
+                    <p><strong>Supplements:</strong> ${state.currentClient.supplements || 'N/A'}</p>
                     
                     <h3>Attendance Summary</h3>
                     <table>
