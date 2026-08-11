@@ -27,15 +27,22 @@ const initialState = {
     clientRegistry: {
         'client_1': {
             id: 'client_1',
-            name: 'Dr. Keerthidaa',
-            age: 29,
+            name: 'Dr. G. Keerthidaa',
+            age: 33,
             gender: 'Female',
+            phone: '7200197793',
             joiningDate: '2025-01-01',
             renewalDate: getPastDateStr(-15), // Active for next 15 days
-            height: 165,
-            weight: 58,
-            medicalCondition: 'Mild Asthma',
+            height: 155,
+            weight: 85,
+            medicalCondition: 'None',
             injuries: 'None',
+            occupation: 'Dentist',
+            goals: 'weight loss / fat loss / strength',
+            diet: 'Pure Veg',
+            sleep: '5-6 hrs',
+            stress: 'high stress',
+            supplements: 'Vitamin D + Magnesium',
             attendance: {
                 [getPastDateStr(1)]: { status: 'present', notes: 'Great stamina during cardio.' },
                 [getPastDateStr(2)]: { status: 'present', notes: 'Completed full lower body workout.' },
@@ -75,11 +82,13 @@ const initialState = {
             medicalCondition: 'None',
             injuries: 'Wrist soreness',
             attendance: {
-                [getPastDateStr(1)]: { status: 'present', notes: '' },
-                [getPastDateStr(2)]: { status: 'absent', notes: '' },
-                [getPastDateStr(3)]: { status: 'present', notes: '' },
+                [getPastDateStr(7)]: { status: 'present', notes: 'Strong engagement.' },
+                [getPastDateStr(6)]: { status: 'present', notes: '' },
+                [getPastDateStr(5)]: { status: 'present', notes: '' },
                 [getPastDateStr(4)]: { status: 'present', notes: '' },
-                [getPastDateStr(5)]: { status: 'present', notes: '' }
+                [getPastDateStr(3)]: { status: 'absent', notes: 'Personal reason.' },
+                [getPastDateStr(2)]: { status: 'present', notes: '' },
+                [getPastDateStr(1)]: { status: 'present', notes: '' }
             }
         },
         'group_2': {
@@ -94,10 +103,13 @@ const initialState = {
             medicalCondition: 'None',
             injuries: 'Lower back tightness',
             attendance: {
-                [getPastDateStr(1)]: { status: 'present', notes: '' },
+                [getPastDateStr(7)]: { status: 'present', notes: '' },
+                [getPastDateStr(6)]: { status: 'present', notes: '' },
+                [getPastDateStr(5)]: { status: 'present', notes: '' },
+                [getPastDateStr(4)]: { status: 'present', notes: '' },
+                [getPastDateStr(3)]: { status: 'present', notes: '' },
                 [getPastDateStr(2)]: { status: 'present', notes: '' },
-                [getPastDateStr(3)]: { status: 'absent', notes: '' },
-                [getPastDateStr(4)]: { status: 'absent', notes: '' }
+                [getPastDateStr(1)]: { status: 'present', notes: '' }
             }
         },
         'group_3': {
@@ -112,10 +124,8 @@ const initialState = {
             medicalCondition: 'None',
             injuries: 'Shoulder impingement',
             attendance: {
-                [getPastDateStr(1)]: { status: 'present', notes: '' },
-                [getPastDateStr(2)]: { status: 'present', notes: '' },
-                [getPastDateStr(3)]: { status: 'present', notes: '' },
-                [getPastDateStr(4)]: { status: 'present', notes: '' }
+                [getPastDateStr(6)]: { status: 'present', notes: '' },
+                [getPastDateStr(3)]: { status: 'present', notes: '' }
             }
         },
         'group_4': {
@@ -130,9 +140,13 @@ const initialState = {
             medicalCondition: 'None',
             injuries: 'None',
             attendance: {
-                [getPastDateStr(1)]: { status: 'absent', notes: '' },
+                [getPastDateStr(7)]: { status: 'present', notes: '' },
+                [getPastDateStr(6)]: { status: 'present', notes: '' },
+                [getPastDateStr(5)]: { status: 'freeze', notes: 'Membership frozen.' },
+                [getPastDateStr(4)]: { status: 'present', notes: '' },
+                [getPastDateStr(3)]: { status: 'absent', notes: '' },
                 [getPastDateStr(2)]: { status: 'present', notes: '' },
-                [getPastDateStr(3)]: { status: 'present', notes: '' }
+                [getPastDateStr(1)]: { status: 'present', notes: '' }
             }
         },
         'group_5': {
@@ -147,9 +161,12 @@ const initialState = {
             medicalCondition: 'None',
             injuries: 'None',
             attendance: {
-                [getPastDateStr(1)]: { status: 'present', notes: '' },
-                [getPastDateStr(2)]: { status: 'present', notes: '' },
-                [getPastDateStr(3)]: { status: 'absent', notes: '' }
+                [getPastDateStr(7)]: { status: 'present', notes: '' },
+                [getPastDateStr(6)]: { status: 'present', notes: '' },
+                [getPastDateStr(5)]: { status: 'holiday', notes: 'National Holiday.' },
+                [getPastDateStr(4)]: { status: 'present', notes: '' },
+                [getPastDateStr(3)]: { status: 'absent', notes: '' },
+                [getPastDateStr(2)]: { status: 'present', notes: '' }
             }
         }
     },
@@ -169,16 +186,20 @@ const initialState = {
 
 // Initialize sessionStorage state
 function loadState() {
-    const stored = sessionStorage.getItem('zuga_state');
+    let stored = sessionStorage.getItem('zuga_state') || sessionStorage.getItem('zuga_session');
     if (!stored) {
-        sessionStorage.setItem('zuga_state', JSON.stringify(initialState));
-        return initialState;
+        const clonedState = JSON.parse(JSON.stringify(initialState));
+        sessionStorage.setItem('zuga_state', JSON.stringify(clonedState));
+        sessionStorage.setItem('zuga_session', JSON.stringify(clonedState));
+        return clonedState;
     }
     return JSON.parse(stored);
 }
 
 function saveState(state) {
-    sessionStorage.setItem('zuga_state', JSON.stringify(state));
+    const val = JSON.stringify(state);
+    sessionStorage.setItem('zuga_state', val);
+    sessionStorage.setItem('zuga_session', val);
 }
 
 // Helper to simulate delay
@@ -381,6 +402,12 @@ const mockApi = {
         });
         saveState(state);
         return { success: true };
+    },
+
+    init: async () => {
+        await delay(400); // simulate ~400ms latency
+        const state = loadState();
+        return state;
     }
 };
 
