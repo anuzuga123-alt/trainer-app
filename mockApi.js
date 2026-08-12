@@ -184,26 +184,65 @@ const initialState = {
     }
 };
 
-// Initialize state with localStorage for persistent state across sessions
+// Real-time Cloud JSON database synchronization via jsonbin-zeta.vercel.app & proxy.cors.sh
+const BIN_ID = 't9plT7QQbE';
+const CLOUD_API_URL = `https://proxy.cors.sh/https://jsonbin-zeta.vercel.app/api/bins/${BIN_ID}`;
+
+let localCachedState = null;
+
 function loadState() {
+    if (localCachedState) return localCachedState;
     let stored = localStorage.getItem('zuga_state') || localStorage.getItem('zuga_session') || sessionStorage.getItem('zuga_state') || sessionStorage.getItem('zuga_session');
     if (!stored) {
         const clonedState = JSON.parse(JSON.stringify(initialState));
-        localStorage.setItem('zuga_state', JSON.stringify(clonedState));
-        localStorage.setItem('zuga_session', JSON.stringify(clonedState));
-        sessionStorage.setItem('zuga_state', JSON.stringify(clonedState));
-        sessionStorage.setItem('zuga_session', JSON.stringify(clonedState));
+        localCachedState = clonedState;
         return clonedState;
     }
-    return JSON.parse(stored);
+    localCachedState = JSON.parse(stored);
+    return localCachedState;
 }
 
-function saveState(state) {
+async function fetchCloudState() {
+    try {
+        const res = await fetch(CLOUD_API_URL, {
+            headers: { 'x-cors-gratis': 'true' }
+        });
+        if (res.ok) {
+            const state = await res.json();
+            localCachedState = state;
+            const val = JSON.stringify(state);
+            localStorage.setItem('zuga_state', val);
+            localStorage.setItem('zuga_session', val);
+            sessionStorage.setItem('zuga_state', val);
+            sessionStorage.setItem('zuga_session', val);
+            return state;
+        }
+    } catch (e) {
+        console.warn('Cloud fetch failed, fallback to local storage', e);
+    }
+    return loadState();
+}
+
+async function saveState(state) {
+    localCachedState = state;
     const val = JSON.stringify(state);
     localStorage.setItem('zuga_state', val);
     localStorage.setItem('zuga_session', val);
     sessionStorage.setItem('zuga_state', val);
     sessionStorage.setItem('zuga_session', val);
+
+    try {
+        await fetch(CLOUD_API_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-cors-gratis': 'true'
+            },
+            body: val
+        });
+    } catch (e) {
+        console.warn('Cloud save failed, saved locally instead', e);
+    }
 }
 
 // Helper to simulate delay
@@ -213,6 +252,7 @@ const mockApi = {
     // Auth APIs
     login: async (email, password) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const trainer = state.trainers.find(t => (t.email === email || t.phone === email) && t.password === password);
         if (trainer) {
@@ -225,6 +265,7 @@ const mockApi = {
 
     register: async (name, phone, email, password) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         if (state.trainers.some(t => t.email === email)) {
             return { success: false, error: 'A trainer with this email already exists' };
@@ -247,7 +288,7 @@ const mockApi = {
                 }
             ]
         };
-        saveState(state);
+        await saveState(state);
         localStorage.setItem('currentTrainer', JSON.stringify(newTrainer));
         sessionStorage.setItem('currentTrainer', JSON.stringify(newTrainer));
         return { success: true, trainer: newTrainer };
@@ -268,6 +309,7 @@ const mockApi = {
     // Global Registry APIs
     getAllClients: async () => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         return Object.values(state.clientRegistry);
     },
@@ -275,6 +317,7 @@ const mockApi = {
     // PT Client APIs
     getPTClients: async (trainerId) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const trainerInfo = state.trainerData[trainerId] || { ptClientIds: [] };
         return trainerInfo.ptClientIds.map(id => state.clientRegistry[id]).filter(Boolean);
@@ -282,6 +325,7 @@ const mockApi = {
 
     addPTClient: async (trainerId, clientData) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const newId = 'client_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
         const newClient = {
@@ -294,12 +338,13 @@ const mockApi = {
             state.trainerData[trainerId] = { ptClientIds: [], groups: [] };
         }
         state.trainerData[trainerId].ptClientIds.push(newId);
-        saveState(state);
+        await saveState(state);
         return { success: true, client: newClient };
     },
 
     updateClient: async (clientData) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const existing = state.clientRegistry[clientData.id];
         if (!existing) {
@@ -309,13 +354,14 @@ const mockApi = {
             ...existing,
             ...clientData
         };
-        saveState(state);
+        await saveState(state);
         return { success: true, client: state.clientRegistry[clientData.id] };
     },
 
     // Group Class APIs
     getGroups: async (trainerId) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const trainerInfo = state.trainerData[trainerId] || { groups: [] };
         // Enrich group clients
@@ -330,6 +376,7 @@ const mockApi = {
 
     addGroupClient: async (trainerId, groupId, clientData) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const newId = 'group_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4);
         const newClient = {
@@ -345,12 +392,13 @@ const mockApi = {
                 group.clientIds.push(newId);
             }
         }
-        saveState(state);
+        await saveState(state);
         return { success: true, client: newClient };
     },
 
     addExistingClientToGroup: async (trainerId, groupId, clientId) => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const trainerInfo = state.trainerData[trainerId];
         if (trainerInfo) {
@@ -358,7 +406,7 @@ const mockApi = {
             if (group) {
                 if (!group.clientIds.includes(clientId)) {
                     group.clientIds.push(clientId);
-                    saveState(state);
+                    await saveState(state);
                     return { success: true };
                 }
                 return { success: false, error: 'Client already in group class' };
@@ -370,6 +418,7 @@ const mockApi = {
     // Attendance APIs
     saveAttendance: async (clientId, date, status, notes = '') => {
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         const client = state.clientRegistry[clientId];
         if (!client) {
@@ -383,13 +432,14 @@ const mockApi = {
         } else {
             client.attendance[date] = { status, notes };
         }
-        saveState(state);
+        await saveState(state);
         return { success: true, client };
     },
 
     saveBatchAttendance: async (batchData) => {
         // batchData: [{ clientId, date, status }]
         await delay(MOCK_DELAY);
+        await fetchCloudState();
         const state = loadState();
         batchData.forEach(({ clientId, date, status }) => {
             const client = state.clientRegistry[clientId];
@@ -407,12 +457,12 @@ const mockApi = {
                 }
             }
         });
-        saveState(state);
+        await saveState(state);
         return { success: true };
     },
 
     init: async () => {
-        await delay(400); // simulate ~400ms latency
+        await fetchCloudState();
         const state = loadState();
         return state;
     }

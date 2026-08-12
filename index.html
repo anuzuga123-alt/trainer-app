@@ -46,6 +46,43 @@
         </div>
     </div>
 
+    <!-- PT Interactive Attendance Popover Modal (Option A) -->
+    <div id="ptAttendancePopover" class="pin-modal-backdrop">
+        <div class="pin-modal-content" style="max-width: 440px; padding: 32px 24px;">
+            <div class="pin-modal-title" style="margin-bottom: 6px;">PT Attendance Log</div>
+            <div id="popoverDateTitle" style="font-weight: 600; color: var(--primary); margin-bottom: 20px; font-size: 16px;">Selected Date</div>
+
+            <label style="text-align: left; display: block; margin-bottom: 12px;">Status Choice</label>
+            <div class="popover-status-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px;">
+                <button class="status-pill-btn" data-status="present" style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.2); color: #10b981; padding: 12px 6px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition-elastic); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    🟢 Present
+                </button>
+                <button class="status-pill-btn" data-status="absent" style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.2); color: #ef4444; padding: 12px 6px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition-elastic); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    🔴 Absent
+                </button>
+                <button class="status-pill-btn" data-status="holiday" style="background: rgba(245, 158, 11, 0.1); border: 2px solid rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 12px 6px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition-elastic); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    🟡 Holiday
+                </button>
+                <button class="status-pill-btn" data-status="freeze" style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 12px 6px; border-radius: var(--radius-sm); font-weight: 700; cursor: pointer; transition: var(--transition-elastic); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    🔵 Freeze
+                </button>
+                <button class="status-pill-btn" data-status="" style="grid-column: span 2; background: var(--surface); border: 2px solid var(--border); color: var(--muted); padding: 12px 6px; border-radius: var(--radius-sm); font-weight: 600; cursor: pointer; transition: var(--transition-elastic); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    ❓ Unrecorded
+                </button>
+            </div>
+
+            <div class="form-group" style="text-align: left; margin-bottom: 24px;">
+                <label for="popoverWorkoutNotes">Workout Notes</label>
+                <textarea id="popoverWorkoutNotes" rows="3" placeholder="Enter today's workout details, progress, or any notes" style="resize: none;"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary btn-small" id="cancelPopoverBtn" style="flex: 1;">Cancel</button>
+                <button class="btn btn-small" id="savePopoverBtn" style="flex: 1;">Save Log</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Past Attendance Mini Modal -->
     <div id="pastAttendanceModal" class="pin-modal-backdrop">
         <div class="pin-modal-content" style="max-width: 400px;">
@@ -433,30 +470,6 @@
                 </div>
             </div>
             
-            <!-- Day Info Section -->
-            <div class="card day-info-card">
-                <div class="day-info-header">
-                    <h3 id="selectedDate">Selected Date</h3>
-                </div>
-                
-                <div class="form-group">
-                    <label for="attendanceSelect">Attendance Status</label>
-                    <select id="attendanceSelect">
-                        <option value="">Select status</option>
-                        <option value="present">🟢 Present</option>
-                        <option value="absent">🔴 Absent</option>
-                        <option value="holiday">🟡 Holiday</option>
-                        <option value="freeze">🔵 Freeze</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="workoutNotes">Workout Notes</label>
-                    <textarea id="workoutNotes" rows="3" placeholder="Enter today's workout details, progress, or any notes"></textarea>
-                </div>
-                
-                <button class="btn locked" id="saveDayInfoBtn" style="width: 100%;">Save Day Info</button>
-            </div>
             
             <!-- Progress Section -->
             <div class="card">
@@ -690,6 +703,16 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label for="newGroupClientJoiningDate">Date of Joining</label>
+                    <input type="date" id="newGroupClientJoiningDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="newGroupClientRenewalDate">Date of Renewal (DOR)</label>
+                    <input type="date" id="newGroupClientRenewalDate">
+                </div>
+
                 <div style="display: flex; gap: 10px;">
                     <button class="btn" id="saveGroupClientBtn" style="flex: 1;">Add to Class</button>
                     <button class="btn btn-secondary" id="cancelGroupAddBtn" style="flex: 1;">Cancel</button>
@@ -786,15 +809,19 @@
             setupEventListeners();
             setupGymPinListeners();
             setupPastModalListeners();
+            setupPopoverListeners();
             setupThemeToggleListeners();
             setupLockInterceptListeners();
             
-            // Set default dates for PT forms
+            // Set default dates for PT forms and Group Client forms
             const todayStr = new Date().toISOString().split('T')[0];
             document.getElementById('newClientJoiningDate').value = todayStr;
             const renewalDate = new Date();
             renewalDate.setDate(renewalDate.getDate() + 30);
             document.getElementById('newClientRenewalDate').value = renewalDate.toISOString().split('T')[0];
+
+            document.getElementById('newGroupClientJoiningDate').value = todayStr;
+            document.getElementById('newGroupClientRenewalDate').value = renewalDate.toISOString().split('T')[0];
         }
 
         // Loader helper
@@ -906,7 +933,7 @@
                 document.getElementById('addGroupClientBtn'),
                 document.getElementById('saveBatchCheckInBtn'),
                 document.getElementById('editClientBtn'),
-                document.getElementById('saveDayInfoBtn'),
+                document.getElementById('savePopoverBtn'),
                 document.getElementById('toggleCheckInModeBtn') // consistent lock on Quick Check-In
             ];
 
@@ -995,7 +1022,6 @@
                 if (!state.isUnlocked) return; // intercepted anyway
                 showEditClientForm();
             });
-            document.getElementById('saveDayInfoBtn').addEventListener('click', saveDayInfo);
             document.getElementById('downloadReportBtn').addEventListener('click', downloadProgressReport);
 
             // PT Calendar Month Navigation
@@ -1259,7 +1285,6 @@
             if (!state.selectedDate) {
                 state.selectedDate = new Date().toISOString().split('T')[0];
             }
-            updateDayInfo();
         }
 
         function showEditClientForm() {
@@ -1440,7 +1465,7 @@
                     });
                     dayCell.classList.add('selected');
                     state.selectedDate = dateStr;
-                    updateDayInfo();
+                    triggerPTAttendancePopover(dateStr);
                 });
 
                 calendarGrid.appendChild(dayCell);
@@ -1457,50 +1482,94 @@
             renderCalendar();
         }
 
-        function updateDayInfo() {
-            if (!state.selectedDate) return;
+        // Popover PT Attendance Modal Handler
+        let popoverSelectedStatus = '';
 
-            const selectedDateElement = document.getElementById('selectedDate');
-            const attendanceSelect = document.getElementById('attendanceSelect');
-            const workoutNotes = document.getElementById('workoutNotes');
+        function triggerPTAttendancePopover(dateStr) {
+            const modal = document.getElementById('ptAttendancePopover');
+            const dateTitle = document.getElementById('popoverDateTitle');
+            const notesTextarea = document.getElementById('popoverWorkoutNotes');
 
-            const date = new Date(state.selectedDate);
-            selectedDateElement.textContent = date.toLocaleDateString('en-US', {
+            const date = new Date(dateStr);
+            dateTitle.textContent = date.toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
 
-            if (state.currentClient.attendance && state.currentClient.attendance[state.selectedDate]) {
-                const dayData = state.currentClient.attendance[state.selectedDate];
-                attendanceSelect.value = dayData.status;
-                workoutNotes.value = dayData.notes || '';
-            } else {
-                attendanceSelect.value = '';
-                workoutNotes.value = '';
+            // Pre-populate values
+            let status = '';
+            let notes = '';
+            if (state.currentClient.attendance && state.currentClient.attendance[dateStr]) {
+                const dayData = state.currentClient.attendance[dateStr];
+                status = dayData.status;
+                notes = dayData.notes || '';
             }
+
+            notesTextarea.value = notes;
+            setPopoverStatusActive(status);
+
+            modal.classList.add('show');
         }
 
-        // Save Attendance Status for individual selected calendar date
-        async function saveDayInfo() {
-            if (!state.isUnlocked) return showToast('Please enter Gym PIN to edit attendance.');
-            if (!state.selectedDate || !state.currentClient) return;
+        function setPopoverStatusActive(status) {
+            popoverSelectedStatus = status;
+            const buttons = document.querySelectorAll('#ptAttendancePopover .status-pill-btn');
+            buttons.forEach(btn => {
+                const btnStatus = btn.getAttribute('data-status');
+                if (btnStatus === status) {
+                    btn.classList.add('active');
+                    btn.style.boxShadow = '0 0 15px var(--primary)';
+                    btn.style.borderColor = 'var(--primary)';
+                } else {
+                    btn.classList.remove('active');
+                    btn.style.boxShadow = 'none';
+                    btn.style.borderColor = 'rgba(255, 255, 255, 0.05)';
+                    if (btnStatus === 'present') btn.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+                    else if (btnStatus === 'absent') btn.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                    else if (btnStatus === 'holiday') btn.style.borderColor = 'rgba(245, 158, 11, 0.2)';
+                    else if (btnStatus === 'freeze') btn.style.borderColor = 'rgba(59, 130, 246, 0.2)';
+                }
+            });
+        }
 
-            const attendance = document.getElementById('attendanceSelect').value;
-            const notes = document.getElementById('workoutNotes').value;
+        function setupPopoverListeners() {
+            // Pill clicks
+            const buttons = document.querySelectorAll('#ptAttendancePopover .status-pill-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const status = btn.getAttribute('data-status');
+                    setPopoverStatusActive(status);
+                });
+            });
 
-            showLoader(true);
-            const res = await mockApi.saveAttendance(state.currentClient.id, state.selectedDate, attendance, notes);
-            showLoader(false);
+            // Save and cancel
+            document.getElementById('cancelPopoverBtn').addEventListener('click', () => {
+                document.getElementById('ptAttendancePopover').classList.remove('show');
+            });
 
-            if (res.success) {
-                state.currentClient = res.client;
-                renderCalendar();
-                showToast('Attendance and progress log saved.');
-            } else {
-                showToast('Failed to save attendance.');
-            }
+            document.getElementById('savePopoverBtn').addEventListener('click', async () => {
+                if (!state.isUnlocked) {
+                    triggerPinModal();
+                    showToast('🔒 Staff PIN required (demo: 1234)');
+                    return;
+                }
+                const notes = document.getElementById('popoverWorkoutNotes').value;
+
+                showLoader(true);
+                const res = await mockApi.saveAttendance(state.currentClient.id, state.selectedDate, popoverSelectedStatus, notes);
+                showLoader(false);
+
+                if (res.success) {
+                    state.currentClient = res.client;
+                    renderCalendar();
+                    document.getElementById('ptAttendancePopover').classList.remove('show');
+                    showToast('Attendance logged successfully.');
+                } else {
+                    showToast('Failed to save attendance.');
+                }
+            });
         }
 
         // PT report generator
@@ -1914,9 +1983,11 @@
             const newName = document.getElementById('newGroupClientName').value;
             const newAge = document.getElementById('newGroupClientAge').value;
             const newGender = document.getElementById('newGroupClientGender').value;
+            const newJoiningDate = document.getElementById('newGroupClientJoiningDate').value;
+            const newRenewalDate = document.getElementById('newGroupClientRenewalDate').value;
 
-            if (!existingClientId && (!newName || !newAge || !newGender)) {
-                showToast('Please select an existing client OR create a new client.');
+            if (!existingClientId && (!newName || !newAge || !newGender || !newJoiningDate || !newRenewalDate)) {
+                showToast('Please select an existing client OR complete all new client fields.');
                 return;
             }
 
@@ -1940,8 +2011,8 @@
                     name: newName,
                     age: newAge,
                     gender: newGender,
-                    joiningDate: new Date().toISOString().split('T')[0],
-                    renewalDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                    joiningDate: newJoiningDate,
+                    renewalDate: newRenewalDate,
                     height: '',
                     weight: '',
                     medicalCondition: '',
@@ -1966,6 +2037,11 @@
             document.getElementById('newGroupClientName').value = '';
             document.getElementById('newGroupClientAge').value = '';
             document.getElementById('newGroupClientGender').value = '';
+            const todayStr = new Date().toISOString().split('T')[0];
+            const renewalDate = new Date();
+            renewalDate.setDate(renewalDate.getDate() + 30);
+            document.getElementById('newGroupClientJoiningDate').value = todayStr;
+            document.getElementById('newGroupClientRenewalDate').value = renewalDate.toISOString().split('T')[0];
         }
 
         // Helper formatting functions

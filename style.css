@@ -806,3 +806,32 @@ details[open] summary {
         margin-right: 0;
     }
 }
+
+/* Interactive Popover pill buttons with glowing effects */
+.status-pill-btn {
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-elastic) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    outline: none;
+}
+
+.status-pill-btn:hover {
+    transform: scale(1.05) translateY(-2px);
+    filter: brightness(1.15);
+}
+
+.status-pill-btn:active {
+    transform: scale(0.95) translateY(0);
+}
+
+.status-pill-btn.active {
+    box-shadow: 0 0 15px var(--primary) !important;
+    border-color: var(--primary) !important;
+    transform: scale(1.04);
+}
