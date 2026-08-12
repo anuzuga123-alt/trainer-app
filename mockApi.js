@@ -172,7 +172,7 @@ const initialState = {
     },
     trainerData: {
         'trainer_1': {
-            ptClientIds: ['client_1', 'client_2'],
+            ptClientIds: ['client_1', 'client_2', 'client_3'],
             groups: [
                 {
                     id: 'group_class_1',
@@ -190,15 +190,75 @@ const CLOUD_API_URL = `https://proxy.cors.sh/https://jsonbin-zeta.vercel.app/api
 
 let localCachedState = null;
 
+function sanitizeAndSyncState(state) {
+    if (!state) return state;
+    if (!state.clientRegistry) state.clientRegistry = {};
+    if (!state.trainerData) state.trainerData = {};
+    if (!state.trainerData['trainer_1']) {
+        state.trainerData['trainer_1'] = { ptClientIds: [], groups: [] };
+    }
+
+    // Ensure client_3 (Rohan Sharma) is in the registry
+    if (!state.clientRegistry['client_3']) {
+        state.clientRegistry['client_3'] = {
+            id: 'client_3',
+            name: 'Rohan Sharma',
+            age: 28,
+            gender: 'Male',
+            phone: '9876543210',
+            joiningDate: '2025-02-01',
+            renewalDate: getPastDateStr(-1), // Tomorrow
+            height: 178,
+            weight: 76,
+            medicalCondition: 'None',
+            injuries: 'Slight knee sensitivity',
+            occupation: 'Software Engineer',
+            goals: 'muscle gain / athletic conditioning',
+            diet: 'Non-Veg (High Protein)',
+            sleep: '7-8 hrs',
+            stress: 'moderate',
+            supplements: 'Whey Protein + Creatine',
+            attendance: {
+                [getPastDateStr(1)]: { status: 'present', notes: 'Pushed hard on squat progression, knee felt stable.' },
+                [getPastDateStr(2)]: { status: 'present', notes: 'Upper body hypertrophy focus. Great form on bench press.' },
+                [getPastDateStr(3)]: { status: 'absent', notes: 'Rest day - had a late office release.' },
+                [getPastDateStr(4)]: { status: 'present', notes: 'Conditioning and core circuits. High intensity.' },
+                [getPastDateStr(5)]: { status: 'present', notes: 'Completed full deadlift session, working sets of 120kg.' },
+                [getPastDateStr(6)]: { status: 'freeze', notes: 'Out of town business trip' },
+                [getPastDateStr(7)]: { status: 'holiday', notes: 'National Holiday - Gym closed' },
+                [getPastDateStr(8)]: { status: 'present', notes: 'Light active recovery and mobility stretches.' }
+            }
+        };
+    }
+
+    // Always dynamically adjust Rohan Sharma's renewal date to exactly tomorrow (1 day away)
+    state.clientRegistry['client_3'].renewalDate = getPastDateStr(-1);
+
+    // Ensure client_3 is linked to trainer_1
+    if (!state.trainerData['trainer_1'].ptClientIds.includes('client_3')) {
+        state.trainerData['trainer_1'].ptClientIds.push('client_3');
+    }
+
+    // Ensure sentEmails outbox list is initialized
+    if (!state.sentEmails) {
+        state.sentEmails = [];
+    }
+
+    return state;
+}
+
 function loadState() {
-    if (localCachedState) return localCachedState;
+    if (localCachedState) return sanitizeAndSyncState(localCachedState);
     let stored = localStorage.getItem('zuga_state') || localStorage.getItem('zuga_session') || sessionStorage.getItem('zuga_state') || sessionStorage.getItem('zuga_session');
+    let state;
     if (!stored) {
         const clonedState = JSON.parse(JSON.stringify(initialState));
-        localCachedState = clonedState;
-        return clonedState;
+        state = clonedState;
+    } else {
+        state = JSON.parse(stored);
     }
-    localCachedState = JSON.parse(stored);
+    state = sanitizeAndSyncState(state);
+    localCachedState = state;
     return localCachedState;
 }
 
@@ -208,7 +268,8 @@ async function fetchCloudState() {
             headers: { 'x-cors-gratis': 'true' }
         });
         if (res.ok) {
-            const state = await res.json();
+            let state = await res.json();
+            state = sanitizeAndSyncState(state);
             localCachedState = state;
             const val = JSON.stringify(state);
             localStorage.setItem('zuga_state', val);
@@ -490,6 +551,33 @@ const mockApi = {
         });
         await saveState(state);
         return { success: true };
+    },
+
+    getSentEmails: async () => {
+        await delay(MOCK_DELAY);
+        await fetchCloudState();
+        const state = loadState();
+        return state.sentEmails || [];
+    },
+
+    sendEmailReport: async (clientId, to, subject, content) => {
+        await delay(MOCK_DELAY);
+        await fetchCloudState();
+        const state = loadState();
+        if (!state.sentEmails) {
+            state.sentEmails = [];
+        }
+        const newMail = {
+            id: 'email_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+            clientId,
+            to,
+            subject,
+            content,
+            sentAt: new Date().toISOString()
+        };
+        state.sentEmails.push(newMail);
+        await saveState(state);
+        return { success: true, email: newMail };
     },
 
     init: async () => {
