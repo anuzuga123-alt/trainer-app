@@ -184,11 +184,13 @@ const initialState = {
     }
 };
 
-// Initialize sessionStorage state
+// Initialize state with localStorage for persistent state across sessions
 function loadState() {
-    let stored = sessionStorage.getItem('zuga_state') || sessionStorage.getItem('zuga_session');
+    let stored = localStorage.getItem('zuga_state') || localStorage.getItem('zuga_session') || sessionStorage.getItem('zuga_state') || sessionStorage.getItem('zuga_session');
     if (!stored) {
         const clonedState = JSON.parse(JSON.stringify(initialState));
+        localStorage.setItem('zuga_state', JSON.stringify(clonedState));
+        localStorage.setItem('zuga_session', JSON.stringify(clonedState));
         sessionStorage.setItem('zuga_state', JSON.stringify(clonedState));
         sessionStorage.setItem('zuga_session', JSON.stringify(clonedState));
         return clonedState;
@@ -198,6 +200,8 @@ function loadState() {
 
 function saveState(state) {
     const val = JSON.stringify(state);
+    localStorage.setItem('zuga_state', val);
+    localStorage.setItem('zuga_session', val);
     sessionStorage.setItem('zuga_state', val);
     sessionStorage.setItem('zuga_session', val);
 }
@@ -212,6 +216,7 @@ const mockApi = {
         const state = loadState();
         const trainer = state.trainers.find(t => (t.email === email || t.phone === email) && t.password === password);
         if (trainer) {
+            localStorage.setItem('currentTrainer', JSON.stringify(trainer));
             sessionStorage.setItem('currentTrainer', JSON.stringify(trainer));
             return { success: true, trainer };
         }
@@ -243,18 +248,20 @@ const mockApi = {
             ]
         };
         saveState(state);
+        localStorage.setItem('currentTrainer', JSON.stringify(newTrainer));
         sessionStorage.setItem('currentTrainer', JSON.stringify(newTrainer));
         return { success: true, trainer: newTrainer };
     },
 
     logout: async () => {
         await delay(MOCK_DELAY);
+        localStorage.removeItem('currentTrainer');
         sessionStorage.removeItem('currentTrainer');
         return { success: true };
     },
 
     getCurrentTrainer: () => {
-        const stored = sessionStorage.getItem('currentTrainer');
+        const stored = localStorage.getItem('currentTrainer') || sessionStorage.getItem('currentTrainer');
         return stored ? JSON.parse(stored) : null;
     },
 
