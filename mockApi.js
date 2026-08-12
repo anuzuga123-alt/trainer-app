@@ -311,7 +311,7 @@ const mockApi = {
         await delay(MOCK_DELAY);
         await fetchCloudState();
         const state = loadState();
-        return Object.values(state.clientRegistry);
+        return Object.values(state.clientRegistry).filter(c => !c.isArchived);
     },
 
     // PT Client APIs
@@ -320,7 +320,7 @@ const mockApi = {
         await fetchCloudState();
         const state = loadState();
         const trainerInfo = state.trainerData[trainerId] || { ptClientIds: [] };
-        return trainerInfo.ptClientIds.map(id => state.clientRegistry[id]).filter(Boolean);
+        return trainerInfo.ptClientIds.map(id => state.clientRegistry[id]).filter(Boolean).filter(c => !c.isArchived);
     },
 
     addPTClient: async (trainerId, clientData) => {
@@ -358,6 +358,37 @@ const mockApi = {
         return { success: true, client: state.clientRegistry[clientData.id] };
     },
 
+    archiveClient: async (clientId) => {
+        await delay(MOCK_DELAY);
+        await fetchCloudState();
+        const state = loadState();
+        const client = state.clientRegistry[clientId];
+        if (!client) {
+            return { success: false, error: 'Client not found' };
+        }
+        client.isArchived = true;
+
+        // Clean up from PT lists in trainerData
+        Object.keys(state.trainerData).forEach(trainerId => {
+            const data = state.trainerData[trainerId];
+            if (data) {
+                if (data.ptClientIds) {
+                    data.ptClientIds = data.ptClientIds.filter(id => id !== clientId);
+                }
+                if (data.groups) {
+                    data.groups.forEach(g => {
+                        if (g.clientIds) {
+                            g.clientIds = g.clientIds.filter(id => id !== clientId);
+                        }
+                    });
+                }
+            }
+        });
+
+        await saveState(state);
+        return { success: true };
+    },
+
     // Group Class APIs
     getGroups: async (trainerId) => {
         await delay(MOCK_DELAY);
@@ -366,7 +397,7 @@ const mockApi = {
         const trainerInfo = state.trainerData[trainerId] || { groups: [] };
         // Enrich group clients
         return trainerInfo.groups.map(group => {
-            const enrichedClients = group.clientIds.map(id => state.clientRegistry[id]).filter(Boolean);
+            const enrichedClients = group.clientIds.map(id => state.clientRegistry[id]).filter(Boolean).filter(c => !c.isArchived);
             return {
                 ...group,
                 clients: enrichedClients

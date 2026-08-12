@@ -330,7 +330,7 @@
             <!-- Sticky Matrix UI View -->
             <div id="stickyMatrixUI">
                 <p style="margin-bottom: 16px; font-size: 14px; color: var(--muted); font-style: italic;">
-                    * Swipe left/right on table to view historical attendance. Tap past cells (🟢/🔴/🟡/🔵) to edit past attendance. Today's column is locked here.
+                    * Swipe left/right on table to view historical attendance. Tap cells (🟢/🔴/🟡/🔵) to edit attendance.
                 </p>
                 <div class="matrix-container">
                     <table class="matrix-table">
@@ -383,7 +383,10 @@
             <!-- Client Info Section -->
             <div class="client-header">
                 <h2 id="clientName">Client Name</h2>
-                <button class="btn btn-small locked" id="editClientBtn">Edit Profile</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-small locked" id="editClientBtn">Edit Profile</button>
+                    <button class="btn btn-small btn-secondary locked" id="deleteClientBtn" style="background-color: var(--danger); color: white;">Delete Client</button>
+                </div>
             </div>
             
             <div class="card" id="clientInfoCard">
@@ -804,6 +807,7 @@
             setupPopoverListeners();
             setupThemeToggleListeners();
             setupLockInterceptListeners();
+            setupDateCalculationListeners();
             
             // Set default dates for PT forms and Group Client forms
             const todayStr = new Date().toISOString().split('T')[0];
@@ -814,6 +818,44 @@
 
             document.getElementById('newGroupClientJoiningDate').value = todayStr;
             document.getElementById('newGroupClientRenewalDate').value = renewalDate.toISOString().split('T')[0];
+        }
+
+        // Auto date of renewal calculation (+30 days)
+        function calculateRenewalDate(joiningDateStr) {
+            if (!joiningDateStr) return '';
+            const date = new Date(joiningDateStr);
+            if (isNaN(date.getTime())) return '';
+            date.setDate(date.getDate() + 30);
+            return date.toISOString().split('T')[0];
+        }
+
+        function setupDateCalculationListeners() {
+            // Add Client Form
+            const newJoining = document.getElementById('newClientJoiningDate');
+            newJoining.addEventListener('change', () => {
+                const calculated = calculateRenewalDate(newJoining.value);
+                if (calculated) {
+                    document.getElementById('newClientRenewalDate').value = calculated;
+                }
+            });
+
+            // Edit Client Form
+            const editJoining = document.getElementById('editClientJoiningDate');
+            editJoining.addEventListener('change', () => {
+                const calculated = calculateRenewalDate(editJoining.value);
+                if (calculated) {
+                    document.getElementById('editClientRenewalDate').value = calculated;
+                }
+            });
+
+            // Group Client Form
+            const groupJoining = document.getElementById('newGroupClientJoiningDate');
+            groupJoining.addEventListener('change', () => {
+                const calculated = calculateRenewalDate(groupJoining.value);
+                if (calculated) {
+                    document.getElementById('newGroupClientRenewalDate').value = calculated;
+                }
+            });
         }
 
         // Loader helper
@@ -925,6 +967,7 @@
                 document.getElementById('addGroupClientBtn'),
                 document.getElementById('saveBatchCheckInBtn'),
                 document.getElementById('editClientBtn'),
+                document.getElementById('deleteClientBtn'),
                 document.getElementById('savePopoverBtn'),
                 document.getElementById('toggleCheckInModeBtn') // consistent lock on Quick Check-In
             ];
@@ -1014,6 +1057,7 @@
                 if (!state.isUnlocked) return; // intercepted anyway
                 showEditClientForm();
             });
+            document.getElementById('deleteClientBtn').addEventListener('click', handleDeleteClient);
             document.getElementById('downloadReportBtn').addEventListener('click', downloadProgressReport);
 
             // PT Calendar Month Navigation
@@ -1249,6 +1293,27 @@
                 `;
                 clientList.appendChild(li);
             });
+        }
+
+        // Delete PT Client Handler
+        async function handleDeleteClient() {
+            if (!state.currentClient) return;
+            if (!state.isUnlocked) return; // intercepted anyway
+
+            const confirmDelete = confirm(`Are you sure you want to delete this client?`);
+            if (!confirmDelete) return;
+
+            showLoader(true);
+            const res = await mockApi.archiveClient(state.currentClient.id);
+            showLoader(false);
+
+            if (res.success) {
+                showToast(`Client "${state.currentClient.name}" has been deleted.`);
+                state.currentClient = null;
+                showView('dashboard');
+            } else {
+                showToast(res.error || 'Failed to delete client.');
+            }
         }
 
         // PT Client profile rendering
@@ -1768,18 +1833,10 @@
                     span.className = `matrix-cell-status ${statusClass}`;
                     span.textContent = statusEmoji;
 
-                    // Tap interaction for editing past dates
-                    if (!d.isToday) {
-                        span.addEventListener('click', () => {
-                            triggerPastEditModal(client, d.dateStr);
-                        });
-                    } else {
-                        // Today's cell is locked for direct tap in matrix, click redirecting to quick check-in
-                        span.title = "Today is locked. Use Quick Check-In to record.";
-                        span.addEventListener('click', () => {
-                            showToast("Please use the Quick Check-In mode to log Today's attendance.");
-                        });
-                    }
+                    // Tap interaction for editing dates (including Today)
+                    span.addEventListener('click', () => {
+                        triggerPastEditModal(client, d.dateStr);
+                    });
 
                     td.appendChild(span);
                     tr.appendChild(td);
