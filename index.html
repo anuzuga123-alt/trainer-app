@@ -502,7 +502,7 @@
             <!-- Email Meta Fields Header -->
             <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 24px; font-size: 14px;">
                 <div style="margin-bottom: 8px; display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">From:</strong> <span style="color: var(--text);">Zuga Automated Mailer &lt;mailer@zugafitness.com&gt;</span></div>
-                <div style="margin-bottom: 8px; display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">To:</strong> <span style="color: var(--primary); font-weight: 600;">zugafitness24@gmsil.com</span></div>
+                <div style="margin-bottom: 8px; display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">To:</strong> <span style="color: var(--primary); font-weight: 600;">zugafitness24@gmail.com</span></div>
                 <div style="display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">Subject:</strong> <span id="previewEmailSubject" style="color: var(--text); font-weight: 500;">Monthly Progress Report - Rohan Sharma</span></div>
             </div>
 
@@ -2746,7 +2746,7 @@
 
             const subject = document.getElementById('previewEmailSubject').textContent;
             const content = generateMonthlyReportHTML(client);
-            const to = "zugafitness24@gmsil.com";
+            const to = "zugafitness24@gmail.com";
 
             // Show simulation progress bar
             const progContainer = document.getElementById('previewEmailProgressBarContainer');
@@ -2802,7 +2802,7 @@
 
             const subject = document.getElementById('previewEmailSubject').textContent;
             const textBody = generateMonthlyReportPlainText(client);
-            const to = "zugafitness24@gmsil.com";
+            const to = "zugafitness24@gmail.com";
 
             const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
 
