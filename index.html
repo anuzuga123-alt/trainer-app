@@ -12,7 +12,7 @@
     <script>
         // Prevent FOUC (Flash of Unstyled Content)
         (function() {
-            var savedTheme = sessionStorage.getItem('zuga_theme') || 'carbon';
+            var savedTheme = localStorage.getItem('zuga_theme') || 'carbon';
             document.documentElement.setAttribute('data-theme', savedTheme);
         })();
     </script>
@@ -765,7 +765,7 @@
         // Initialize the app
         async function initApp() {
             // Check theme, sync state of toggle indicator button
-            const savedTheme = sessionStorage.getItem('zuga_theme') || 'carbon';
+            const savedTheme = localStorage.getItem('zuga_theme') || 'carbon';
             document.documentElement.setAttribute('data-theme', savedTheme);
             updateThemeToggleButton(savedTheme);
 
@@ -778,32 +778,24 @@
             }
             showLoader(false);
 
-            // Auto-login/bypass for premium co-founder and testing experience
-            let currentTrainer = mockApi.getCurrentTrainer();
-            if (!currentTrainer) {
-                // Instantly log in default Head Coach to bypass "login drama"
-                const defaultTrainer = {
-                    id: 'trainer_1',
-                    name: 'Head Coach',
-                    email: 'trainer@zuga.com',
-                    phone: '1234567890',
-                    password: 'zuga2026'
-                };
-                localStorage.setItem('currentTrainer', JSON.stringify(defaultTrainer));
-                sessionStorage.setItem('currentTrainer', JSON.stringify(defaultTrainer));
-                currentTrainer = defaultTrainer;
-            }
+            // SaaS SaaS model bypass: Directly log into trainer_1
+            const defaultTrainer = {
+                id: 'trainer_1',
+                name: 'Head Coach',
+                email: 'trainer@zuga.com',
+                phone: '1234567890',
+                password: 'zuga2026'
+            };
+            localStorage.setItem('currentTrainer', JSON.stringify(defaultTrainer));
+            sessionStorage.setItem('currentTrainer', JSON.stringify(defaultTrainer));
+            let currentTrainer = defaultTrainer;
 
-            // Lock bypass: Let's automatically unlock staff mode for seamless co-founder flow
+            // Direct unlocked access to all app features
             state.isUnlocked = true;
             sessionStorage.setItem('zuga_staff_unlocked', 'true');
 
-            if (currentTrainer) {
-                state.currentTrainer = currentTrainer;
-                showView('hub');
-            } else {
-                showView('login');
-            }
+            state.currentTrainer = currentTrainer;
+            showView('hub');
 
             // Set up all event listeners
             setupEventListeners();
@@ -955,9 +947,9 @@
             const toggles = document.querySelectorAll('.theme-toggle-btn');
             toggles.forEach(toggle => {
                 toggle.addEventListener('click', () => {
-                    const currentTheme = sessionStorage.getItem('zuga_theme') || 'carbon';
+                    const currentTheme = localStorage.getItem('zuga_theme') || 'carbon';
                     const nextTheme = currentTheme === 'carbon' ? 'studio' : 'carbon';
-                    sessionStorage.setItem('zuga_theme', nextTheme);
+                    localStorage.setItem('zuga_theme', nextTheme);
                     document.documentElement.setAttribute('data-theme', nextTheme);
                     updateThemeToggleButton(nextTheme);
                     showToast(`Theme switched to ${nextTheme === 'carbon' ? 'Carbon & Volt' : 'Studio'}`);
@@ -1976,8 +1968,18 @@
         }
 
         async function handleAddGroupClient() {
-            if (!state.isUnlocked) return showToast('Please unlock with Gym PIN first.');
-            if (!state.currentGroupClass) return;
+            // Unlocked SaaS mode bypasses pin locks and robustly falls back to group_class_1 if state is null
+            let activeGroupId = state.currentGroupClass ? state.currentGroupClass.id : null;
+            if (!activeGroupId) {
+                const groups = await mockApi.getGroups(state.currentTrainer.id);
+                if (groups && groups.length > 0) {
+                    activeGroupId = groups[0].id;
+                    state.currentGroupClass = groups[0];
+                } else {
+                    showToast('No active class available to add client to.');
+                    return;
+                }
+            }
 
             const existingClientId = document.getElementById('existingClientSelect').value;
             const newName = document.getElementById('newGroupClientName').value;
@@ -1995,7 +1997,7 @@
 
             if (existingClientId) {
                 // Add existing registry client to class
-                const res = await mockApi.addExistingClientToGroup(state.currentTrainer.id, state.currentGroupClass.id, existingClientId);
+                const res = await mockApi.addExistingClientToGroup(state.currentTrainer.id, activeGroupId, existingClientId);
                 showLoader(false);
 
                 if (res.success) {
@@ -2019,7 +2021,7 @@
                     injuries: ''
                 };
 
-                const res = await mockApi.addGroupClient(state.currentTrainer.id, state.currentGroupClass.id, clientData);
+                const res = await mockApi.addGroupClient(state.currentTrainer.id, activeGroupId, clientData);
                 showLoader(false);
 
                 if (res.success) {
