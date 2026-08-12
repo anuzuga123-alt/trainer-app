@@ -257,6 +257,22 @@
                         <span>➔</span>
                     </div>
                 </div>
+
+                <!-- Automated Mailer Card -->
+                <div class="hub-card" id="mailerCard">
+                    <div class="hub-card-bg">📧</div>
+                    <div>
+                        <div class="hub-card-header">
+                            <div class="hub-card-icon">📧</div>
+                            <h3 class="hub-card-title">Reports & Mailer</h3>
+                        </div>
+                        <p class="hub-card-desc">Generate client monthly reports, manage automated emails 1 day prior to renewal, and view logs.</p>
+                    </div>
+                    <div class="hub-card-action">
+                        <span>Open Mailer Panel</span>
+                        <span>➔</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -360,6 +376,159 @@
 
                 <button class="btn locked" id="saveBatchCheckInBtn" style="width: 100%;">Save Batch Check-In</button>
                 <button class="btn btn-outline btn-small" id="cancelCheckInBtn" style="width: 100%; margin-top: 12px;">Cancel & Go Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Automated Mailer View -->
+    <div id="mailerView" class="view">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="https://raw.githubusercontent.com/anuzuga123-alt/Zuga-Fitness-Trainer-App/main/photo_2025-03-07_22-31-00.jpg" alt="Zuga Fitness Logo">
+                </div>
+                <span>Zuga Mailer</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button class="theme-toggle-btn" title="Toggle Theme">☀️</button>
+                <div class="padlock-trigger" id="mailerPadlock" title="Toggle Staff Mode">🔒</div>
+                <button class="btn btn-secondary btn-small" id="backToHubFromMailerBtn">Back to Hub</button>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="dashboard-header">
+                <h2 class="dashboard-title">Monthly Report Mailer</h2>
+                <span class="hint-chip" style="margin-left: 0;">Automated Dispatch (1 Day Before Renewal)</span>
+            </div>
+
+            <!-- Mailer Stats Grid -->
+            <div class="stats-container" style="margin-bottom: 32px;">
+                <div class="stat-card">
+                    <div class="stat-value text-accent" id="mailerPendingCount" style="color: var(--accent);">1</div>
+                    <div class="stat-label">Action Needed (1 Day Prior)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="mailerSentCount">0</div>
+                    <div class="stat-label">Reports Dispatched</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value text-success" style="color: var(--success);">100%</div>
+                    <div class="stat-label">Delivery Health</div>
+                </div>
+            </div>
+
+            <!-- Pending Dispatches Section -->
+            <div class="card" style="margin-bottom: 32px; border-left: 5px solid var(--accent);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="font-size: 20px; font-weight: 700;">⚠️ Tomorrow's Renewals (Pending Mailer)</h3>
+                    <span style="font-size: 13px; color: var(--muted); font-style: italic;">Auto-computed based on client renewal dates</span>
+                </div>
+                <div class="matrix-container" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
+                    <table class="matrix-table" style="min-width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Renewal Date</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mailerPendingBody">
+                            <!-- Populated dynamically (e.g. Rohan Sharma) -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- All Clients Manual Trigger Directory -->
+            <div class="card" style="margin-bottom: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+                    <h3 style="font-size: 20px; font-weight: 700;">📂 Global Clients Directory</h3>
+                    <div class="input-wrapper" style="max-width: 300px; margin-bottom: 0;">
+                        <input type="text" id="mailerSearchInput" placeholder="Search clients..." style="padding: 8px 12px 8px 36px; font-size: 14px; border-radius: var(--radius-sm);">
+                        <div class="input-icon" style="font-size: 14px;">🔍</div>
+                    </div>
+                </div>
+                <div class="matrix-container" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
+                    <table class="matrix-table" style="min-width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Renewal Date</th>
+                                <th>Cycle Progress</th>
+                                <th style="text-align: right;">On-Demand Report</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mailerDirectoryBody">
+                            <!-- List of all other clients -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SMTP Simulated Sent Outbox Logs -->
+            <div class="card">
+                <h3 style="font-size: 20px; font-weight: 700; margin-bottom: 20px;">📜 Sent Email Logs (Outbox)</h3>
+                <div class="matrix-container" style="margin-bottom: 0; box-shadow: none; border: none; padding: 0;">
+                    <table class="matrix-table" style="min-width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Recipient</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th style="text-align: right;">View Log</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mailerLogsBody">
+                            <!-- Log of sent emails -->
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--muted); padding: 30px;">No emails dispatched yet.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email High-Fidelity Preview Modal -->
+    <div id="emailPreviewModal" class="pin-modal-backdrop">
+        <div class="pin-modal-content" style="max-width: 650px; width: 90%; padding: 32px 24px; text-align: left; overflow-y: auto; max-height: 90vh; border-radius: var(--radius);">
+            <div class="pin-modal-title" style="margin-bottom: 6px; text-align: center;">📧 Email Dispatch Preview</div>
+            <div style="font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 24px;">Confirm content and trigger transmission to head coach inbox</div>
+
+            <!-- Email Meta Fields Header -->
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 24px; font-size: 14px;">
+                <div style="margin-bottom: 8px; display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">From:</strong> <span style="color: var(--text);">Zuga Automated Mailer &lt;mailer@zugafitness.com&gt;</span></div>
+                <div style="margin-bottom: 8px; display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">To:</strong> <span style="color: var(--primary); font-weight: 600;">zugafitness24@gmsil.com</span></div>
+                <div style="display: flex; gap: 8px;"><strong style="color: var(--muted); width: 80px; display: inline-block;">Subject:</strong> <span id="previewEmailSubject" style="color: var(--text); font-weight: 500;">Monthly Progress Report - Rohan Sharma</span></div>
+            </div>
+
+            <!-- HTML Email Content Container (Glassmorphic Mockup) -->
+            <div style="border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); padding: 24px; overflow-x: auto; font-family: 'Poppins', sans-serif; max-height: 350px; overflow-y: auto; margin-bottom: 24px; color: var(--text);">
+                <div id="previewEmailContentContainer">
+                    <!-- Dynamic high-fidelity styled email content goes here -->
+                </div>
+            </div>
+
+            <!-- Simulated progress bar -->
+            <div id="previewEmailProgressBarContainer" style="display: none; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                    <span id="previewEmailProgressStatus" style="color: var(--primary);">Connecting to SMTP server...</span>
+                    <span id="previewEmailProgressPercent" style="font-weight: 600;">0%</span>
+                </div>
+                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 99px; overflow: hidden;">
+                    <div id="previewEmailProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: width 0.3s ease;"></div>
+                </div>
+            </div>
+
+            <!-- Actions buttons -->
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-small" id="closePreviewBtn" style="flex: 1; min-width: 100px;">Close</button>
+                <button class="btn btn-outline btn-small" id="mailtoPreviewBtn" style="flex: 1; min-width: 150px;">📧 Mailto App</button>
+                <button class="btn btn-small" id="sendPreviewBtn" style="flex: 2; min-width: 180px;">⚡ Send Real Simulation</button>
             </div>
         </div>
     </div>
@@ -746,6 +915,13 @@
             pastEdit: {
                 clientId: null,
                 date: null
+            },
+
+            // Temporary mailer modal state
+            mailerModal: {
+                clientId: null,
+                mode: 'send',
+                logId: null
             }
         };
 
@@ -759,7 +935,8 @@
             editClient: document.getElementById('editClientModal'),
             addClient: document.getElementById('addClientModal'),
             groupClasses: document.getElementById('groupClassesView'),
-            addGroupClient: document.getElementById('addGroupClientModal')
+            addGroupClient: document.getElementById('addGroupClientModal'),
+            mailer: document.getElementById('mailerView')
         };
 
         // Initialize the app
@@ -999,6 +1176,22 @@
             document.getElementById('groupCard').addEventListener('click', async () => {
                 showView('groupClasses');
             });
+            document.getElementById('mailerCard').addEventListener('click', () => {
+                showView('mailer');
+            });
+
+            // Mailer View Listeners
+            document.getElementById('backToHubFromMailerBtn').addEventListener('click', () => {
+                showView('hub');
+            });
+            document.getElementById('mailerSearchInput').addEventListener('input', () => {
+                renderMailerDirectoryList();
+            });
+            document.getElementById('closePreviewBtn').addEventListener('click', () => {
+                document.getElementById('emailPreviewModal').classList.remove('show');
+            });
+            document.getElementById('sendPreviewBtn').addEventListener('click', executeSimulatedEmailSend);
+            document.getElementById('mailtoPreviewBtn').addEventListener('click', executeNativeEmailMailto);
 
             // PT Dashboard View
             document.getElementById('addClientBtn').addEventListener('click', () => {
@@ -1094,6 +1287,10 @@
             } else if (viewName === 'client' && state.currentClient) {
                 renderClientProfile();
                 renderCalendar();
+            } else if (viewName === 'mailer') {
+                showLoader(true);
+                await renderMailerView();
+                showLoader(false);
             }
         }
 
@@ -2044,6 +2241,517 @@
             renewalDate.setDate(renewalDate.getDate() + 30);
             document.getElementById('newGroupClientJoiningDate').value = todayStr;
             document.getElementById('newGroupClientRenewalDate').value = renewalDate.toISOString().split('T')[0];
+        }
+
+        // ==========================================
+        // AUTOMATED MAILER / MONTHLY REPORT LOGIC
+        // ==========================================
+
+        function isExactlyOneDayBefore(renewalDateStr) {
+            if (!renewalDateStr) return false;
+
+            const renewalDate = new Date(renewalDateStr);
+            const today = new Date();
+
+            const d1 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const d2 = new Date(renewalDate.getFullYear(), renewalDate.getMonth(), renewalDate.getDate());
+
+            const diffTime = d2.getTime() - d1.getTime();
+            const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays === 1;
+        }
+
+        let currentGlobalMailerClients = []; // Local cache for filtering directory list
+
+        async function renderMailerView() {
+            const clients = await mockApi.getAllClients();
+            const sentLogs = await mockApi.getSentEmails();
+
+            currentGlobalMailerClients = clients;
+
+            // Separate clients into Tomorrow's renewal and Others
+            const pendingClients = [];
+            clients.forEach(c => {
+                if (isExactlyOneDayBefore(c.renewalDate)) {
+                    pendingClients.push(c);
+                }
+            });
+
+            // 1. Render Stats
+            document.getElementById('mailerPendingCount').textContent = pendingClients.length;
+
+            // Count unique client dispatches
+            const uniqueClientsDispatched = new Set(sentLogs.map(l => l.clientId));
+            document.getElementById('mailerSentCount').textContent = uniqueClientsDispatched.size;
+
+            // 2. Render Pending Tomorrow's Renewals Table
+            const pendingBody = document.getElementById('mailerPendingBody');
+            pendingBody.innerHTML = '';
+
+            if (pendingClients.length === 0) {
+                pendingBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--muted); padding: 24px;">
+                            🎉 No client renewals tomorrow! All caught up.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                pendingClients.forEach(c => {
+                    const tr = document.createElement('tr');
+
+                    // Check if already sent today/previously
+                    const alreadySent = sentLogs.some(log => log.clientId === c.id);
+                    const statusTag = alreadySent
+                        ? `<span style="color: var(--success); font-weight: 700;">🟢 Dispatched</span>`
+                        : `<span style="color: var(--accent); font-weight: 700; animation: pulse 1.5s infinite;">⚠️ Tomorrow</span>`;
+
+                    const actionButton = alreadySent
+                        ? `<button class="btn btn-secondary btn-small" onclick="triggerEmailPreview('${c.id}', 'view-log', '${sentLogs.find(l => l.clientId === c.id).id}')" style="padding: 6px 12px; font-size: 11px;">👁️ View Sent Outbox</button>`
+                        : `<div style="display: flex; gap: 8px; justify-content: flex-end;">
+                            <button class="btn btn-outline btn-small" onclick="triggerEmailPreview('${c.id}', 'send')" style="padding: 6px 12px; font-size: 11px;">👁️ Preview</button>
+                            <button class="btn btn-small" onclick="triggerEmailPreview('${c.id}', 'send')" style="padding: 6px 12px; font-size: 11px;">✉️ Send Report</button>
+                           </div>`;
+
+                    tr.innerHTML = `
+                        <td style="font-weight: 600; color: var(--text);">${c.name}</td>
+                        <td>${formatDate(c.renewalDate)}</td>
+                        <td>${statusTag}</td>
+                        <td style="text-align: right;">${actionButton}</td>
+                    `;
+                    pendingBody.appendChild(tr);
+                });
+            }
+
+            // 3. Render Directory List
+            renderMailerDirectoryList();
+
+            // 4. Render Outbox Logs Table
+            const logsBody = document.getElementById('mailerLogsBody');
+            logsBody.innerHTML = '';
+
+            if (sentLogs.length === 0) {
+                logsBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--muted); padding: 24px;">
+                            No email logs available in the SMTP Outbox.
+                        </td>
+                    </tr>
+                `;
+            } else {
+                // Render sorted newest first
+                const sortedLogs = [...sentLogs].reverse();
+                sortedLogs.forEach(log => {
+                    const tr = document.createElement('tr');
+                    const client = clients.find(cl => cl.id === log.clientId);
+                    const clientNameLabel = client ? client.name : 'Unknown Client';
+                    const timestampLabel = new Date(log.sentAt).toLocaleString('en-GB', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit'
+                    });
+
+                    tr.innerHTML = `
+                        <td style="font-size: 12px; color: var(--muted);">${timestampLabel}</td>
+                        <td style="font-weight: 600; color: var(--primary);">${log.to}</td>
+                        <td style="font-size: 13px;">${log.subject}</td>
+                        <td><span class="badge" style="background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.2); padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700;">🟢 Delivered</span></td>
+                        <td style="text-align: right;">
+                            <button class="btn btn-outline btn-small" onclick="triggerEmailPreview('${log.clientId}', 'view-log', '${log.id}')" style="padding: 4px 10px; font-size: 11px;">👁️ View</button>
+                        </td>
+                    `;
+                    logsBody.appendChild(tr);
+                });
+            }
+        }
+
+        function renderMailerDirectoryList() {
+            const query = document.getElementById('mailerSearchInput').value.toLowerCase().trim();
+            const body = document.getElementById('mailerDirectoryBody');
+            body.innerHTML = '';
+
+            // Filter out pending clients from manual trigger, or just keep all clients and allow forcing on-demand reports
+            const filtered = currentGlobalMailerClients.filter(c => {
+                return c.name.toLowerCase().includes(query) || (c.phone && c.phone.includes(query));
+            });
+
+            if (filtered.length === 0) {
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--muted); padding: 20px;">No clients match search query.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filtered.forEach(c => {
+                const tr = document.createElement('tr');
+                const renewalDate = new Date(c.renewalDate);
+                const isExpired = renewalDate < new Date();
+
+                // Days left
+                const diffTime = renewalDate.getTime() - new Date().getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let progressText = '';
+                if (isExpired) {
+                    progressText = `<span style="color: var(--accent); font-weight: 600;">Expired (${Math.abs(diffDays)} days ago)</span>`;
+                } else if (diffDays === 0) {
+                    progressText = `<span style="color: var(--warning); font-weight: 600;">Expires TODAY!</span>`;
+                } else if (diffDays === 1) {
+                    progressText = `<span style="color: var(--accent); font-weight: 600; animation: pulse 1s infinite;">Expires TOMORROW</span>`;
+                } else {
+                    progressText = `<span style="color: var(--success);">${diffDays} days left</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: var(--text);">${c.name}</td>
+                    <td>${formatDate(c.renewalDate)}</td>
+                    <td>${progressText}</td>
+                    <td style="text-align: right;">
+                        <button class="btn btn-outline btn-small" onclick="triggerEmailPreview('${c.id}', 'send')" style="padding: 6px 14px; font-size: 11px; border-color: var(--primary); color: var(--primary);">📄 Custom Preview</button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+        }
+
+        // Expose triggerEmailPreview globally so inline onclick handlers can call it
+        window.triggerEmailPreview = triggerEmailPreview;
+
+        function generateMonthlyReportHTML(client) {
+            const joiningDate = new Date(client.joiningDate);
+            const renewalDate = new Date(client.renewalDate);
+            const dateRange = `${joiningDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })} - ${renewalDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+
+            let presentCount = 0;
+            let absentCount = 0;
+            let holidayCount = 0;
+            let freezeCount = 0;
+            let totalDays = 0;
+
+            const startDate = new Date(joiningDate);
+            const endDate = new Date(renewalDate);
+
+            let safeCount = 0;
+            const records = [];
+            for (let date = new Date(startDate); date <= endDate && safeCount < 500; date.setDate(date.getDate() + 1)) {
+                safeCount++;
+                totalDays++;
+                const dateStr = date.toISOString().split('T')[0];
+                const dayData = client.attendance ? client.attendance[dateStr] : null;
+
+                if (dayData) {
+                    records.push({
+                        dateLabel: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }),
+                        status: dayData.status,
+                        notes: dayData.notes || ''
+                    });
+
+                    switch(dayData.status) {
+                        case 'present': presentCount++; break;
+                        case 'absent': absentCount++; break;
+                        case 'holiday': holidayCount++; break;
+                        case 'freeze': freezeCount++; break;
+                    }
+                }
+            }
+
+            const attendanceRate = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
+
+            let notesHTML = '';
+            if (records.length === 0) {
+                notesHTML = `<tr><td colspan="3" style="text-align: center; color: #94a3b8; padding: 12px; font-style: italic;">No attendance sessions recorded for this cycle.</td></tr>`;
+            } else {
+                records.reverse();
+                records.forEach(r => {
+                    let badgeColor = '#10b981';
+                    let statusEmoji = '🟢';
+                    if (r.status === 'absent') { badgeColor = '#ef4444'; statusEmoji = '🔴'; }
+                    else if (r.status === 'holiday') { badgeColor = '#f59e0b'; statusEmoji = '🟡'; }
+                    else if (r.status === 'freeze') { badgeColor = '#3b82f6'; statusEmoji = '🔵'; }
+
+                    notesHTML += `
+                        <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                            <td style="padding: 10px; font-weight: 600; font-size: 13px; color: #f8fafc; white-space: nowrap;">${r.dateLabel}</td>
+                            <td style="padding: 10px;">
+                                <span style="background: rgba(255,255,255,0.05); color: ${badgeColor}; border: 1px solid ${badgeColor}; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; white-space: nowrap;">
+                                    ${statusEmoji} ${r.status}
+                                </span>
+                            </td>
+                            <td style="padding: 10px; font-size: 13px; color: #94a3b8; line-height: 1.4;">${r.notes || '<span style="color: rgba(255,255,255,0.15); font-style: italic;">No notes logged.</span>'}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            return `
+                <div style="font-family: 'Space Grotesk', 'Poppins', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0b1329; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                    <div style="background: linear-gradient(135deg, #a3e635 0%, #22d3ee 100%); padding: 3px;"></div>
+
+                    <div style="padding: 24px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: #0f172a;">
+                        <div style="font-size: 24px; font-weight: 800; color: #a3e635; letter-spacing: -0.02em; margin-bottom: 4px;">ZUGA FITNESS</div>
+                        <div style="font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;">Monthly Client Progress Report</div>
+                    </div>
+
+                    <div style="padding: 24px; background: rgba(255, 255, 255, 0.01); border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                        <div style="font-size: 18px; font-weight: 700; color: #f8fafc; margin-bottom: 16px;">
+                            👤 ${client.name}
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; font-size: 13px; color: #94a3b8;">
+                            <div><strong>Age/Gender:</strong> <span style="color: #f8fafc;">${client.age} yrs • ${client.gender}</span></div>
+                            <div><strong>Cycle Period:</strong> <span style="color: #22d3ee; font-weight: 600;">${dateRange}</span></div>
+                            <div><strong>Height:</strong> <span style="color: #f8fafc;">${client.height || 'N/A'} cm</span></div>
+                            <div><strong>Weight:</strong> <span style="color: #f8fafc;">${client.weight || 'N/A'} kg</span></div>
+                            <div><strong>Diet:</strong> <span style="color: #f8fafc;">${client.diet || 'N/A'}</span></div>
+                            <div><strong>Primary Goals:</strong> <span style="color: #f8fafc;">${client.goals || 'N/A'}</span></div>
+                        </div>
+                    </div>
+
+                    <div style="padding: 24px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">
+                        <div style="font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 14px;">📈 Cycle Attendance Dashboard</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; text-align: center; margin-bottom: 20px;">
+                            <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.15); border-radius: 8px; padding: 10px;">
+                                <div style="font-size: 18px; font-weight: 700; color: #10b981;">${presentCount}</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">PRESENT</div>
+                            </div>
+                            <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.15); border-radius: 8px; padding: 10px;">
+                                <div style="font-size: 18px; font-weight: 700; color: #ef4444;">${absentCount}</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">ABSENT</div>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.15); border-radius: 8px; padding: 10px;">
+                                <div style="font-size: 18px; font-weight: 700; color: #3b82f6;">${freezeCount}</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">FREEZE</div>
+                            </div>
+                            <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.15); border-radius: 8px; padding: 10px;">
+                                <div style="font-size: 18px; font-weight: 700; color: #f59e0b;">${holidayCount}</div>
+                                <div style="font-size: 10px; color: #94a3b8; font-weight: 600;">HOLIDAY</div>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(163, 230, 53, 0.05); border: 1px solid rgba(163, 230, 53, 0.15); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                            <span style="color: #94a3b8; font-weight: 600;">Attendance Rate:</span>
+                            <span style="color: #a3e635; font-size: 18px; font-weight: 800;">${attendanceRate}%</span>
+                        </div>
+                    </div>
+
+                    <div style="padding: 24px;">
+                        <div style="font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 14px;">📝 Chronological Trainer Session Logs</div>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 700;">
+                                    <th style="padding: 8px 10px; text-align: left;">Date</th>
+                                    <th style="padding: 8px 10px; text-align: left;">Status</th>
+                                    <th style="padding: 8px 10px; text-align: left;">Workout Notes / Comments</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${notesHTML}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="padding: 20px; background: #0f172a; border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; font-size: 11px; color: #64748b; line-height: 1.5;">
+                        This automated monthly report is strictly generated and transmitted from secure Zuga Fitness systems.<br>
+                        Trainer Staff Contact: <a href="mailto:trainer@zuga.com" style="color: #a3e635; text-decoration: none;">trainer@zuga.com</a> • Head Admin Desk
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateMonthlyReportPlainText(client) {
+            const joiningDate = new Date(client.joiningDate);
+            const renewalDate = new Date(client.renewalDate);
+            const dateRange = `${joiningDate.toLocaleDateString('en-GB')} - ${renewalDate.toLocaleDateString('en-GB')}`;
+
+            let presentCount = 0;
+            let absentCount = 0;
+            let holidayCount = 0;
+            let freezeCount = 0;
+            let totalDays = 0;
+
+            const startDate = new Date(joiningDate);
+            const endDate = new Date(renewalDate);
+            const records = [];
+
+            let safeCount = 0;
+            for (let date = new Date(startDate); date <= endDate && safeCount < 500; date.setDate(date.getDate() + 1)) {
+                safeCount++;
+                totalDays++;
+                const dateStr = date.toISOString().split('T')[0];
+                const dayData = client.attendance ? client.attendance[dateStr] : null;
+
+                if (dayData) {
+                    records.push({
+                        dateLabel: date.toLocaleDateString('en-GB'),
+                        status: dayData.status,
+                        notes: dayData.notes || ''
+                    });
+
+                    switch(dayData.status) {
+                        case 'present': presentCount++; break;
+                        case 'absent': absentCount++; break;
+                        case 'holiday': holidayCount++; break;
+                        case 'freeze': freezeCount++; break;
+                    }
+                }
+            }
+
+            const attendanceRate = totalDays > 0 ? Math.round((presentCount / totalDays) * 100) : 0;
+
+            let textBody = `ZUGA FITNESS - CLIENT MONTHLY PROGRESS REPORT\n`;
+            textBody += `==============================================\n\n`;
+            textBody += `CLIENT PROFILE:\n`;
+            textBody += `Name: ${client.name}\n`;
+            textBody += `Age/Gender: ${client.age} yrs • ${client.gender}\n`;
+            textBody += `Cycle Period: ${dateRange}\n`;
+            textBody += `Height/Weight: ${client.height || 'N/A'} cm / ${client.weight || 'N/A'} kg\n`;
+            textBody += `Diet: ${client.diet || 'N/A'}\n`;
+            textBody += `Primary Goals: ${client.goals || 'N/A'}\n\n`;
+
+            textBody += `ATTENDANCE METRICS:\n`;
+            textBody += `Present: ${presentCount} days\n`;
+            textBody += `Absent: ${absentCount} days\n`;
+            textBody += `Freeze: ${freezeCount} days\n`;
+            textBody += `Holiday: ${holidayCount} days\n`;
+            textBody += `Attendance Rate: ${attendanceRate}%\n\n`;
+
+            textBody += `CHRONOLOGICAL WORKOUT SESSION LOGS:\n`;
+            if (records.length === 0) {
+                textBody += `No attendance sessions recorded for this cycle.\n`;
+            } else {
+                records.reverse();
+                records.forEach(r => {
+                    const statusIndicator = r.status.toUpperCase();
+                    textBody += `* [${r.dateLabel}] [${statusIndicator}]: ${r.notes || 'No notes logged.'}\n`;
+                });
+            }
+
+            textBody += `\n==============================================\n`;
+            textBody += `Generated by Head Coach Trainer staff. Zuga Fitness.`;
+
+            return textBody;
+        }
+
+        async function triggerEmailPreview(clientId, mode, logId = null) {
+            const clients = await mockApi.getAllClients();
+            const client = clients.find(c => c.id === clientId);
+            if (!client) return showToast('Client not found.');
+
+            state.mailerModal.clientId = clientId;
+            state.mailerModal.mode = mode;
+            state.mailerModal.logId = logId;
+
+            // Reset simulated progress elements
+            document.getElementById('previewEmailProgressBarContainer').style.display = 'none';
+            document.getElementById('previewEmailProgressBar').style.width = '0%';
+
+            const subjectSpan = document.getElementById('previewEmailSubject');
+            const previewContainer = document.getElementById('previewEmailContentContainer');
+
+            const isRenewalTomorrow = isExactlyOneDayBefore(client.renewalDate);
+            const subjectStr = isRenewalTomorrow
+                ? `Monthly Progress Report: ${client.name} [Renewal: Tomorrow]`
+                : `Monthly Progress Report: ${client.name}`;
+
+            subjectSpan.textContent = subjectStr;
+
+            if (mode === 'view-log' && logId) {
+                const logs = await mockApi.getSentEmails();
+                const log = logs.find(l => l.id === logId);
+                if (log) {
+                    previewContainer.innerHTML = log.content;
+                    subjectSpan.textContent = log.subject;
+                } else {
+                    previewContainer.innerHTML = generateMonthlyReportHTML(client);
+                }
+
+                // Set button states for View Mode (No send/mailto buttons, only Close)
+                document.getElementById('sendPreviewBtn').style.display = 'none';
+                document.getElementById('mailtoPreviewBtn').style.display = 'none';
+                document.getElementById('closePreviewBtn').textContent = 'Dismiss Log';
+                document.getElementById('closePreviewBtn').style.flex = '1';
+            } else {
+                // Send mode
+                previewContainer.innerHTML = generateMonthlyReportHTML(client);
+                document.getElementById('sendPreviewBtn').style.display = 'inline-block';
+                document.getElementById('mailtoPreviewBtn').style.display = 'inline-block';
+                document.getElementById('closePreviewBtn').textContent = 'Close';
+                document.getElementById('closePreviewBtn').style.flex = '1';
+            }
+
+            document.getElementById('emailPreviewModal').classList.add('show');
+        }
+
+        async function executeSimulatedEmailSend() {
+            const clientList = await mockApi.getAllClients();
+            const client = clientList.find(c => c.id === state.mailerModal.clientId);
+            if (!client) return showToast('Client data lost.');
+
+            const subject = document.getElementById('previewEmailSubject').textContent;
+            const content = generateMonthlyReportHTML(client);
+            const to = "zugafitness24@gmsil.com";
+
+            // Show simulation progress bar
+            const progContainer = document.getElementById('previewEmailProgressBarContainer');
+            const progressBar = document.getElementById('previewEmailProgressBar');
+            const progressStatus = document.getElementById('previewEmailProgressStatus');
+            const progressPercent = document.getElementById('previewEmailProgressPercent');
+
+            progContainer.style.display = 'block';
+
+            // Disable interaction buttons during dispatching
+            document.getElementById('sendPreviewBtn').disabled = true;
+            document.getElementById('mailtoPreviewBtn').disabled = true;
+            document.getElementById('closePreviewBtn').disabled = true;
+
+            const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+            const steps = [
+                { p: 15, msg: "Resolving SMTP mail server..." },
+                { p: 40, msg: "Authenticating credentials for trainer@zuga.com..." },
+                { p: 65, msg: "Transmitting monthly progress body payload..." },
+                { p: 85, msg: "Finalizing secure delivery handshakes..." },
+                { p: 100, msg: "Email successfully queued and delivered!" }
+            ];
+
+            for (const step of steps) {
+                progressBar.style.width = `${step.p}%`;
+                progressPercent.textContent = `${step.p}%`;
+                progressStatus.textContent = step.msg;
+                await sleep(500);
+            }
+
+            // Perform Mock SMTP dispatch
+            const res = await mockApi.sendEmailReport(client.id, to, subject, content);
+
+            // Restore button states
+            document.getElementById('sendPreviewBtn').disabled = false;
+            document.getElementById('mailtoPreviewBtn').disabled = false;
+            document.getElementById('closePreviewBtn').disabled = false;
+
+            if (res.success) {
+                document.getElementById('emailPreviewModal').classList.remove('show');
+                showToast(`📧 Report email successfully dispatched to ${to}!`);
+                await renderMailerView();
+            } else {
+                showToast('Failed to dispatch simulated email.');
+            }
+        }
+
+        async function executeNativeEmailMailto() {
+            const clientList = await mockApi.getAllClients();
+            const client = clientList.find(c => c.id === state.mailerModal.clientId);
+            if (!client) return showToast('Client data lost.');
+
+            const subject = document.getElementById('previewEmailSubject').textContent;
+            const textBody = generateMonthlyReportPlainText(client);
+            const to = "zugafitness24@gmsil.com";
+
+            const mailtoUrl = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(textBody)}`;
+
+            // Open user's default native client
+            window.open(mailtoUrl, '_blank');
+            showToast('Triggered native client with prefilled report payload.');
         }
 
         // Helper formatting functions
