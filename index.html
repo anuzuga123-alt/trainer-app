@@ -2778,6 +2778,42 @@
                 await sleep(500);
             }
 
+            // Perform real Formspree POST
+            let formspreeSuccess = false;
+            try {
+                const response = await fetch("https://formspree.io/f/mgawyqrj", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: to,
+                        _subject: subject,
+                        clientName: client.name,
+                        cyclePeriod: `${client.joiningDate} to ${client.renewalDate}`,
+                        message: generateMonthlyReportPlainText(client)
+                    })
+                });
+                if (response.ok) {
+                    formspreeSuccess = true;
+                } else {
+                    const errData = await response.json();
+                    console.error("Formspree error:", errData);
+                }
+            } catch (err) {
+                console.error("Fetch to Formspree failed:", err);
+            }
+
+            if (!formspreeSuccess) {
+                // Restore button states
+                document.getElementById('sendPreviewBtn').disabled = false;
+                document.getElementById('mailtoPreviewBtn').disabled = false;
+                document.getElementById('closePreviewBtn').disabled = false;
+                showToast('❌ Failed to dispatch email via Formspree.');
+                return;
+            }
+
             // Perform Mock SMTP dispatch
             const res = await mockApi.sendEmailReport(client.id, to, subject, content);
 
@@ -2791,7 +2827,7 @@
                 showToast(`📧 Report email successfully dispatched to ${to}!`);
                 await renderMailerView();
             } else {
-                showToast('Failed to dispatch simulated email.');
+                showToast('Failed to save email dispatch log.');
             }
         }
 
