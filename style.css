@@ -647,6 +647,17 @@ input:focus + .input-icon {
     min-width: 180px;
 }
 
+.interactive-client-name {
+    cursor: pointer;
+    text-decoration: underline;
+    transition: var(--transition-elastic);
+}
+
+.interactive-client-name:hover {
+    color: var(--primary);
+    transform: scale(1.02);
+}
+
 .matrix-cell-status {
     width: 44px;
     height: 44px;
