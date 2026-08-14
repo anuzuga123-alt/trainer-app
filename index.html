@@ -345,6 +345,22 @@
 
             <!-- Sticky Matrix UI View -->
             <div id="stickyMatrixUI">
+                <!-- Premium Date Sliding Controller -->
+                <div class="slider-container card" style="padding: 16px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 24px;">📅</span>
+                        <div>
+                            <div style="font-weight: 700; font-size: 15px;">Slide to View Past Dates</div>
+                            <div id="sliderDateRangeLabel" style="font-size: 12px; color: var(--primary); font-weight: 600;">Showing last 7 days starting from today</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-grow: 1; max-width: 400px; justify-content: flex-end;">
+                        <span style="font-size: 12px; color: var(--muted); font-weight: 600;">Today</span>
+                        <input type="range" id="matrixDateSlider" min="0" max="30" value="0" style="flex-grow: 1; height: 6px; border-radius: 99px; outline: none; background: rgba(255,255,255,0.1); cursor: pointer; padding: 0; margin: 0; accent-color: var(--primary);">
+                        <span style="font-size: 12px; color: var(--muted); font-weight: 600;">30 Days Ago</span>
+                    </div>
+                </div>
+
                 <p style="margin-bottom: 16px; font-size: 14px; color: var(--muted); font-style: italic;">
                     * Swipe left/right on table to view historical attendance. Tap cells (🟢/🔴/🟡/🔵) to edit attendance.
                 </p>
@@ -1242,7 +1258,11 @@
                 showView('addClient');
             });
             document.getElementById('backToDashboardBtn').addEventListener('click', () => {
-                showView('dashboard');
+                if (state.currentClient && state.currentClient.id && state.currentClient.id.startsWith('group_')) {
+                    showView('groupClasses');
+                } else {
+                    showView('dashboard');
+                }
             });
 
             // PT Client Profile View
@@ -1272,6 +1292,14 @@
             });
             document.getElementById('saveGroupClientBtn').addEventListener('click', handleAddGroupClient);
             document.getElementById('cancelGroupAddBtn').addEventListener('click', () => showView('groupClasses'));
+
+            // Matrix Date Slider Interaction
+            const slider = document.getElementById('matrixDateSlider');
+            if (slider) {
+                slider.addEventListener('input', () => {
+                    renderGroupClassesView(false); // Render instantly without fetching from database
+                });
+            }
 
             // Floating Home Button
             document.getElementById('floatingHomeBtn').addEventListener('click', () => {
@@ -1326,7 +1354,7 @@
                 showLoader(false);
             } else if (viewName === 'groupClasses') {
                 showLoader(true);
-                await renderGroupClassesView();
+                await renderGroupClassesView(true);
                 showLoader(false);
             } else if (viewName === 'client' && state.currentClient) {
                 renderClientProfile();
@@ -1500,6 +1528,8 @@
             const confirmDelete = confirm(`Are you sure you want to delete this client?`);
             if (!confirmDelete) return;
 
+            const isGroupClient = state.currentClient.id && state.currentClient.id.startsWith('group_');
+
             showLoader(true);
             const res = await mockApi.archiveClient(state.currentClient.id);
             showLoader(false);
@@ -1507,7 +1537,11 @@
             if (res.success) {
                 showToast(`Client "${state.currentClient.name}" has been deleted.`);
                 state.currentClient = null;
-                showView('dashboard');
+                if (isGroupClient) {
+                    showView('groupClasses');
+                } else {
+                    showView('dashboard');
+                }
             } else {
                 showToast(res.error || 'Failed to delete client.');
             }
@@ -1950,15 +1984,18 @@
         // GROUP CLASSES & STICKY MATRIX LOGIC
         // ==========================================
 
-        async function renderGroupClassesView() {
+        async function renderGroupClassesView(forceFetch = false) {
             if (!state.currentTrainer) return;
 
-            const groups = await mockApi.getGroups(state.currentTrainer.id);
-            if (!groups || groups.length === 0) return;
+            if (forceFetch || !state.currentGroupClass) {
+                const groups = await mockApi.getGroups(state.currentTrainer.id);
+                if (groups && groups.length > 0) {
+                    state.currentGroupClass = groups[0];
+                }
+            }
 
-            // Load first group for Phase 1 (6 AM Power Yoga)
-            const activeGroup = groups[0];
-            state.currentGroupClass = activeGroup;
+            const activeGroup = state.currentGroupClass;
+            if (!activeGroup) return;
 
             document.getElementById('classNameTitle').textContent = activeGroup.name;
 
@@ -1966,17 +2003,29 @@
             document.getElementById('quickCheckInUI').style.display = 'none';
             document.getElementById('stickyMatrixUI').style.display = 'block';
 
-            // Generate Past 7 days column metadata
+            // Read range offset from the slider
+            const slider = document.getElementById('matrixDateSlider');
+            const offset = slider ? parseInt(slider.value) || 0 : 0;
+
+            // Generate Past 7 days column metadata with offset
             const dates = [];
             for (let i = 6; i >= 0; i--) {
                 const dateObj = new Date();
-                dateObj.setDate(dateObj.getDate() - i);
+                dateObj.setDate(dateObj.getDate() - i - offset);
                 dates.push({
                     dateStr: dateObj.toISOString().split('T')[0],
                     label: dateObj.toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
                     dayName: dateObj.toLocaleDateString('en-US', { weekday: 'short' }),
-                    isToday: i === 0
+                    isToday: i === 0 && offset === 0
                 });
+            }
+
+            // Update the slider range text label
+            const labelEl = document.getElementById('sliderDateRangeLabel');
+            if (labelEl && dates.length > 0) {
+                const startLabel = `${dates[0].dayName} ${dates[0].label}`;
+                const endLabel = dates[6].isToday ? 'Today' : `${dates[6].dayName} ${dates[6].label}`;
+                labelEl.textContent = `Showing range: ${startLabel} to ${endLabel}`;
             }
 
             // Build table header
@@ -2007,8 +2056,12 @@
 
                 // Sticky name column
                 const nameTd = document.createElement('td');
-                nameTd.className = 'sticky-col';
+                nameTd.className = 'sticky-col interactive-client-name';
                 nameTd.textContent = client.name;
+                nameTd.addEventListener('click', () => {
+                    state.currentClient = client;
+                    showView('client');
+                });
                 tr.appendChild(nameTd);
 
                 // Date columns status indicators
@@ -2079,7 +2132,7 @@
             if (res.success) {
                 document.getElementById('pastAttendanceModal').classList.remove('show');
                 showToast('Attendance logged successfully');
-                await renderGroupClassesView();
+                await renderGroupClassesView(true);
             } else {
                 showToast('Error saving past attendance');
             }
@@ -2187,7 +2240,7 @@
                 showToast('Group batch attendance saved successfully!');
                 document.getElementById('quickCheckInUI').style.display = 'none';
                 document.getElementById('stickyMatrixUI').style.display = 'block';
-                await renderGroupClassesView();
+                await renderGroupClassesView(true);
             } else {
                 showToast('Failed to save batch attendance.');
             }
