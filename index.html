@@ -1332,7 +1332,7 @@
             document.addEventListener('touchstart', function() {}, {passive: true});
         }
 
-        // Show a specific view
+        // Show a specific view instantly with zero delay
         async function showView(viewName) {
             // Hide all views
             Object.values(views).forEach(v => {
@@ -1344,25 +1344,18 @@
 
             applyLockState();
 
-            // Perform View-specific Initializations
+            // Perform View-specific Initializations without blocking full-screen loaders
             if (viewName === 'hub') {
-                // Lock check
                 applyLockState();
             } else if (viewName === 'dashboard') {
-                showLoader(true);
                 await renderClientList();
-                showLoader(false);
             } else if (viewName === 'groupClasses') {
-                showLoader(true);
                 await renderGroupClassesView(true);
-                showLoader(false);
             } else if (viewName === 'client' && state.currentClient) {
                 renderClientProfile();
                 renderCalendar();
             } else if (viewName === 'mailer') {
-                showLoader(true);
                 await renderMailerView();
-                showLoader(false);
             }
         }
 
@@ -1530,9 +1523,7 @@
 
             const isGroupClient = state.currentClient.id && state.currentClient.id.startsWith('group_');
 
-            showLoader(true);
             const res = await mockApi.archiveClient(state.currentClient.id);
-            showLoader(false);
 
             if (res.success) {
                 showToast(`Client "${state.currentClient.name}" has been deleted.`);
@@ -1627,7 +1618,6 @@
                 return;
             }
 
-            showLoader(true);
             const updated = {
                 id: state.currentClient.id,
                 name, age, gender, joiningDate, renewalDate, height, weight, medicalCondition, injuries,
@@ -1635,7 +1625,6 @@
             };
 
             const res = await mockApi.updateClient(updated);
-            showLoader(false);
 
             if (res.success) {
                 state.currentClient = res.client;
@@ -1671,14 +1660,12 @@
                 return;
             }
 
-            showLoader(true);
             const clientData = {
                 name, age, gender, joiningDate, renewalDate, height, weight, medicalCondition, injuries,
                 occupation, goals, diet, sleep, stress, supplements
             };
 
             const res = await mockApi.addPTClient(state.currentTrainer.id, clientData);
-            showLoader(false);
 
             if (res.success) {
                 await showView('dashboard');
@@ -1845,9 +1832,7 @@
                 }
                 const notes = document.getElementById('popoverWorkoutNotes').value;
 
-                showLoader(true);
                 const res = await mockApi.saveAttendance(state.currentClient.id, state.selectedDate, popoverSelectedStatus, notes);
-                showLoader(false);
 
                 if (res.success) {
                     state.currentClient = res.client;
@@ -2125,9 +2110,7 @@
             const status = document.getElementById('pastAttendanceSelect').value;
             const notes = document.getElementById('pastWorkoutNotes').value;
 
-            showLoader(true);
             const res = await mockApi.saveAttendance(state.pastEdit.clientId, state.pastEdit.date, status, notes);
-            showLoader(false);
 
             if (res.success) {
                 document.getElementById('pastAttendanceModal').classList.remove('show');
@@ -2215,7 +2198,6 @@
         }
 
         async function saveBatchCheckIn() {
-            console.log("saveBatchCheckIn clicked! isUnlocked:", state.isUnlocked, "currentGroupClass:", state.currentGroupClass);
             if (!state.isUnlocked) return showToast('Please enter Gym PIN to submit attendance logs.');
             if (!state.currentGroupClass) return;
 
@@ -2230,11 +2212,7 @@
                 });
             });
 
-            console.log("Batch data to save:", batchData);
-            showLoader(true);
             const res = await mockApi.saveBatchAttendance(batchData);
-            showLoader(false);
-            console.log("mockApi.saveBatchAttendance response:", res);
 
             if (res.success) {
                 showToast('Group batch attendance saved successfully!');
@@ -2305,7 +2283,6 @@
             if (existingClientId) {
                 // Add existing registry client to class
                 const res = await mockApi.addExistingClientToGroup(state.currentTrainer.id, activeGroupId, existingClientId);
-                showLoader(false);
 
                 if (res.success) {
                     showToast('Client added to class!');
@@ -2329,7 +2306,6 @@
                 };
 
                 const res = await mockApi.addGroupClient(state.currentTrainer.id, activeGroupId, clientData);
-                showLoader(false);
 
                 if (res.success) {
                     showToast(`Created and added ${newName} to group class.`);
