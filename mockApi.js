@@ -4,7 +4,7 @@
  * Persists to sessionStorage.
  */
 
-const MOCK_DELAY = 500;
+const MOCK_DELAY = 0;
 
 // Dynamic Date Helpers relative to Today
 const getPastDateStr = (daysAgo) => {
@@ -292,18 +292,17 @@ async function saveState(state) {
     sessionStorage.setItem('zuga_state', val);
     sessionStorage.setItem('zuga_session', val);
 
-    try {
-        await fetch(CLOUD_API_URL, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-cors-gratis': 'true'
-            },
-            body: val
-        });
-    } catch (e) {
+    // Asynchronous background cloud sync (non-blocking for UI responsiveness)
+    fetch(CLOUD_API_URL, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-cors-gratis': 'true'
+        },
+        body: val
+    }).catch(e => {
         console.warn('Cloud save failed, saved locally instead', e);
-    }
+    });
 }
 
 // Helper to simulate delay
